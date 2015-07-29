@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Xevle.Imaging.Image
 {
@@ -41,14 +42,14 @@ namespace Xevle.Imaging.Image
 		/// <param name="width">Width.</param>
 		/// <param name="height">Height.</param>
 		/// <param name="format">Format.</param>
-		public Image8i(uint width, uint height, ChannelFormat format = ChannelFormat.RGB)
+		public Image8i(uint width, uint height, ChannelFormat format = ChannelFormat.RGB, byte[] imageData=null)
 		{
 			Width = width;
 			Height = height;
 
 			ChannelFormat = format;
 
-			imageData = null;
+			this.imageData = imageData;
 	
 			if (width * height > 0) imageData = new byte[width * height * GetBytePerPixelFromChannelFormat(format)];
 		}

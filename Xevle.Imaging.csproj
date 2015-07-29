@@ -43,6 +43,7 @@
     <Compile Include="Image\ChannelFormat.cs" />
     <Compile Include="Image\Statics.cs" />
     <Compile Include="Image\Color8i.cs" />
+    <Compile Include="Image\Formats\TruevisionImage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -53,5 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Image\" />
+    <Folder Include="Image\Formats\" />
   </ItemGroup>
 </Project>
