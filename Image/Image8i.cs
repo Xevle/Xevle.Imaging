@@ -597,6 +597,158 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region Channel swap methods
+		/// <summary>
+		/// Swaps the channels to BRG.
+		/// </summary>
+		/// <returns>The channels to BR.</returns>
+		public Image8i SwapChannelsToBRG()
+		{
+			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height;
+			byte[] src = imageData;
+			uint ind = 0;
+			byte[] dst = ret.imageData;
+			uint inds = 0;
+
+			// Channel Swap RGB
+			for (uint i = 0; i < count; i++)
+			{
+				byte r = src[inds++];
+				byte g = src[inds++];
+				byte b = src[inds++];
+				dst[ind++] = b;
+				dst[ind++] = r;
+				dst[ind++] = g;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Swaps the channels to RBB
+		/// </summary>
+		/// <returns>The channels to RB.</returns>
+		public Image8i SwapChannelsToRBG()
+		{
+			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height;
+			byte[] src = imageData;
+			uint ind = 0;
+			byte[] dst = ret.imageData;
+			uint inds = 0;
+
+			//Channel Swap RGB
+			for (uint i = 0; i < count; i++)
+			{
+				byte r = src[inds++];
+				byte g = src[inds++];
+				byte b = src[inds++];
+				dst[ind++] = r;
+				dst[ind++] = b;
+				dst[ind++] = g;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Swaps the channels to GRB.
+		/// </summary>
+		/// <returns>The channels to GR.</returns>
+		public Image8i SwapChannelsToGRB()
+		{
+			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height;
+			byte[] src = imageData;
+			uint ind = 0;
+			byte[] dst = ret.imageData;
+			uint inds = 0;
+
+			//Channel Swap RGB
+			for (uint i = 0; i < count; i++)
+			{
+				byte r = src[inds++];
+				byte g = src[inds++];
+				byte b = src[inds++];
+				dst[ind++] = g;
+				dst[ind++] = r;
+				dst[ind++] = b;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Swaps the channels to BGR.
+		/// </summary>
+		/// <returns>The channels to background.</returns>
+		public Image8i SwapChannelsToBGR()
+		{
+			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBGR();
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height;
+			byte[] src = imageData;
+			uint ind = 0;
+			byte[] dst = ret.imageData;
+			uint inds = 0;
+
+			// Channel Swap RGB
+			for (uint i = 0; i < count; i++)
+			{
+				byte r = src[inds++];
+				byte g = src[inds++];
+				byte b = src[inds++];
+				dst[ind++] = b;
+				dst[ind++] = g;
+				dst[ind++] = r;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Swaps the channels to GBR;
+		/// </summary>
+		/// <returns>The channels to GB.</returns>
+		public Image8i SwapChannelsToGBR()
+		{
+			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height;
+			byte[] src = imageData;
+			uint ind = 0;
+			byte[] dst = ret.imageData;
+			uint inds = 0;
+
+			// Channel Swap RGB
+			for (uint i = 0; i < count; i++)
+			{
+				byte r = src[inds++];
+				byte g = src[inds++];
+				byte b = src[inds++];
+				dst[ind++] = g;
+				dst[ind++] = b;
+				dst[ind++] = r;
+			}
+
+			return ret;
+		}
+		#endregion
+
 		#region Drawing methods
 		/// <summary>
 		/// Draw the specified x, y and source.
