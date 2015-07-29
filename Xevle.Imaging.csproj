@@ -42,13 +42,10 @@
     <Compile Include="Image\Image8i.cs" />
     <Compile Include="Image\ChannelFormat.cs" />
     <Compile Include="Image\Statics.cs" />
+    <Compile Include="Image\Color8i.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Xevle.Math\Xevle.Math.csproj">
-      <Project>{69DDF62D-1B61-4B1E-8452-91436E0DAADB}</Project>
-      <Name>Xevle.Math</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Xevle.IO\Xevle.IO.csproj">
       <Project>{FF1643AA-E194-4145-8248-028ED9503EB4}</Project>
       <Name>Xevle.IO</Name>
