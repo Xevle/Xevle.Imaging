@@ -5,7 +5,7 @@ namespace Xevle.Imaging.Image
 	/// <summary>
 	/// List of color formats.
 	/// </summary>
-	public enum ColorFormat
+	public enum ChannelFormat
 	{
 		GRAY = 0,
 		GRAYAlpha = 1,
