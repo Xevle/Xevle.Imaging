@@ -1506,6 +1506,98 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region Fill
+		public void Fill(Color8i color)
+		{
+			unsafe
+			{
+				fixed(byte* dst_=imageData)
+				{
+					byte* dst = dst_;
+
+					if (ChannelFormat == ChannelFormat.GRAY)
+					{
+						byte g = color.R;
+						int len = imageData.Length;
+						for (int i = 0; i < len; i++) *dst++ = g;
+					}
+					else if (ChannelFormat == ChannelFormat.RGB)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						int len = imageData.Length / 3;
+
+						for (int i = 0; i < len; i++)
+						{
+							*dst++ = b;
+							*dst++ = g;
+							*dst++ = r;
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.BGR)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						int len = imageData.Length / 3;
+
+						for (int i = 0; i < len; i++)
+						{
+							*dst++ = r;
+							*dst++ = g;
+							*dst++ = b;
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.RGBA)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						byte a = color.A;
+						int len = imageData.Length / 4;
+
+						for (int i = 0; i < len; i++)
+						{
+							*dst++ = b;
+							*dst++ = g;
+							*dst++ = r;
+							*dst++ = a;
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.BGRA)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						byte a = color.A;
+						int len = imageData.Length / 4;
+
+						for (int i = 0; i < len; i++)
+						{
+							*dst++ = r;
+							*dst++ = g;
+							*dst++ = b;
+							*dst++ = a;
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+					{
+						byte g = color.R;
+						byte a = color.A;
+						int len = imageData.Length / 2;
+
+						for (int i = 0; i < len; i++)
+						{
+							*dst++ = g;
+							*dst++ = a;
+						}
+					}
+				}
+			}
+		}
+		#endregion
+
 		#region GetImage and GetSubImage methods
 		/// <summary>
 		/// Gets the image.
