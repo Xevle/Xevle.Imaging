@@ -751,6 +751,510 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region Downsampling
+		public Image8i Downsample(uint w, uint h)
+		{
+			if (Width < w || Height < h) throw new Exception("Don't upsample an image using 'Downsample()'");
+
+			if (Width == w && Height == h) return this;
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			if ((w * h) == 0) return new Image8i(0, 0, ChannelFormat);
+
+			if (Width != w)
+			{
+				if (Height != h)
+				{
+					if ((Height * w) > (Width * h)) return DownsampleVertical(h).DownsampleHorizontal(w);
+					return DownsampleHorizontal(w).DownsampleVertical(h);
+				}
+				return DownsampleHorizontal(w);
+			}
+
+			return DownsampleVertical(h);
+		}
+
+		unsafe Image8i DownsampleVertical(uint h)
+		{
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			if (h == 0) return new Image8i(0, 0, ChannelFormat);
+
+			if (Height > h && Height % h == 0) return ReduceByVertical(Height / h);
+			double delta = ((double)Height) / h;
+
+			if (ChannelFormat == ChannelFormat.GRAY)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					fixed(byte* _dst=ret.imageData, _src=imageData)
+					{
+						byte* dst = _dst + x;
+						byte* src = _src + x;
+
+						for (uint y = 0; y < h; y++)
+						{
+							double deltay = y * delta;
+							double dy = 1 - (deltay - ((uint)deltay));
+							byte* s = src + ((uint)deltay) * Width;
+							double deltasum = dy;
+
+							double gsum = *s * dy;
+							s += Width;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dy = delta - deltasum;
+								if (dy >= 1)
+								{
+									deltasum += 1;
+									gsum += *s;
+									s += Width;
+								}
+								else
+								{
+									gsum += *s * dy;
+									break;
+								}
+							}
+
+							*dst = (byte)(gsum / delta + 0.5);
+							dst += Width;
+						}
+					}
+				}
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.BGR)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				int wb = (int)Width * 3;
+				int wb2 = wb - 2;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					fixed(byte* _dst=ret.imageData, _src=imageData)
+					{
+						byte* dst = _dst + x * 3;
+						byte* src = _src + x * 3;
+
+						for (uint y = 0; y < h; y++)
+						{
+							double deltay = y * delta;
+							double dy = 1 - (deltay - ((uint)deltay));
+							byte* s = src + ((uint)deltay) * wb;
+							double deltasum = dy;
+
+							double rsum = *(s++) * dy;
+							double gsum = *(s++) * dy;
+							double bsum = *s * dy;
+							s += wb2;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dy = delta - deltasum;
+								if (dy >= 1)
+								{
+									deltasum += 1;
+									rsum += *(s++);
+									gsum += *(s++);
+									bsum += *s;
+									s += wb2;
+								}
+								else
+								{
+									rsum += *(s++) * dy;
+									gsum += *(s++) * dy;
+									bsum += *s * dy;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(rsum / delta + 0.5);
+							*(dst++) = (byte)(gsum / delta + 0.5);
+							*dst = (byte)(bsum / delta + 0.5);
+							dst += wb2;
+						}
+					}
+				}
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGBA || ChannelFormat == ChannelFormat.BGRA)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				int wb = (int)Width * 4;
+				int wb3 = wb - 3;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					fixed(byte* _dst=ret.imageData, _src=imageData)
+					{
+						byte* dst = _dst + x * 4;
+						byte* src = _src + x * 4;
+
+						for (uint y = 0; y < h; y++)
+						{
+							double deltay = y * delta;
+							double dy = 1 - (deltay - ((uint)deltay));
+							byte* s = src + ((uint)deltay) * wb;
+							double deltasum = dy;
+
+							byte r = *(s++), g = *(s++), b = *(s++);
+							uint a = *s;
+							s += wb3;
+
+							double ady = a * dy;
+							double rsum = r * ady;
+							double gsum = g * ady;
+							double bsum = b * ady;
+							double asum = ady;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								r = *(s++);
+								g = *(s++);
+								b = *(s++);
+								a = *s;
+								s += wb3;
+
+								dy = delta - deltasum;
+								if (dy >= 1)
+								{
+									deltasum += 1;
+									rsum += r * a;
+									gsum += g * a;
+									bsum += b * a;
+									asum += a;
+								}
+								else
+								{
+									ady = a * dy;
+									rsum += r * ady;
+									gsum += g * ady;
+									bsum += b * ady;
+									asum += ady;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(rsum / asum + 0.5);
+							*(dst++) = (byte)(gsum / asum + 0.5);
+							*(dst++) = (byte)(bsum / asum + 0.5);
+							*dst = (byte)(asum / delta + 0.5);
+							dst += wb3;
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				int wb = (int)Width * 2;
+				int wb1 = wb - 1;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					fixed(byte* _dst=ret.imageData, _src=imageData)
+					{
+						byte* dst = _dst + x * 2;
+						byte* src = _src + x * 2;
+
+						for (uint y = 0; y < h; y++)
+						{
+							double deltay = y * delta;
+							double dy = 1 - (deltay - ((uint)deltay));
+							byte* s = src + ((uint)deltay) * wb;
+							double deltasum = dy;
+
+							byte g = *(s++);
+							uint a = *s;
+							s += wb1;
+
+							double ady = a * dy;
+							double gsum = g * ady;
+							double asum = ady;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								g = *(s++);
+								a = *s;
+								s += wb1;
+
+								dy = delta - deltasum;
+								if (dy >= 1)
+								{
+									deltasum += 1;
+									gsum += g * a;
+									asum += a;
+								}
+								else
+								{
+									ady = a * dy;
+									gsum += g * ady;
+									asum += ady;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(gsum / asum + 0.5);
+							*dst = (byte)(asum / delta + 0.5);
+							dst += wb1;
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
+		}
+
+		unsafe Image8i DownsampleHorizontal(uint w)
+		{
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			if (w == 0) return new Image8i(0, 0, ChannelFormat);
+
+			if (Width > w && Width % w == 0) return ReduceByHorizontal(Width / w);
+
+			double delta = ((double)Width) / w;
+
+			if (ChannelFormat == ChannelFormat.GRAY)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				fixed(byte* _dst=ret.imageData, _src=imageData)
+				{
+					byte* dst = _dst;
+
+					for (uint y = 0; y < Height; y++)
+					{
+						byte* src = _src + y * Width;
+
+						for (uint x = 0; x < w; x++)
+						{
+							double deltax = x * delta;
+							double dx = 1 - (deltax - ((uint)deltax));
+							byte* s = src + ((uint)deltax);
+							double deltasum = dx;
+
+							double gsum = *(s++) * dx;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dx = delta - deltasum;
+								if (dx >= 1)
+								{
+									deltasum += 1;
+									gsum += *(s++);
+								}
+								else
+								{
+									gsum += *s * dx;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(gsum / delta + 0.5);
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.BGR)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				fixed(byte* _dst=ret.imageData, _src=imageData)
+				{
+					byte* dst = _dst;
+					uint wb = Width * 3;
+
+					for (uint y = 0; y < Height; y++)
+					{
+						byte* src = _src + y * wb;
+
+						for (uint x = 0; x < w; x++)
+						{
+							double deltax = x * delta;
+							double dx = 1 - (deltax - ((uint)deltax));
+							byte* s = src + ((uint)deltax) * 3;
+							double deltasum = dx;
+
+							double rsum = *(s++) * dx;
+							double gsum = *(s++) * dx;
+							double bsum = *(s++) * dx;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dx = delta - deltasum;
+								if (dx >= 1)
+								{
+									deltasum += 1;
+									rsum += *(s++);
+									gsum += *(s++);
+									bsum += *(s++);
+								}
+								else
+								{
+									rsum += *(s++) * dx;
+									gsum += *(s++) * dx;
+									bsum += *s * dx;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(rsum / delta + 0.5);
+							*(dst++) = (byte)(gsum / delta + 0.5);
+							*(dst++) = (byte)(bsum / delta + 0.5);
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGBA || ChannelFormat == ChannelFormat.BGRA)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				fixed(byte* _dst=ret.imageData, _src=imageData)
+				{
+					byte* dst = _dst;
+					uint wb = Width * 4;
+
+					for (uint y = 0; y < Height; y++)
+					{
+						byte* src = _src + y * wb;
+
+						for (uint x = 0; x < w; x++)
+						{
+							double deltax = x * delta;
+							double dx = 1 - (deltax - ((uint)deltax));
+							byte* s = src + ((uint)deltax) * 4;
+							double deltasum = dx;
+
+							byte r = *(s++), g = *(s++), b = *(s++);
+							uint a = *(s++);
+
+							double adx = a * dx;
+							double rsum = r * adx;
+							double gsum = g * adx;
+							double bsum = b * adx;
+							double asum = adx;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dx = delta - deltasum;
+								r = *(s++);
+								g = *(s++);
+								b = *(s++);
+								a = *(s++);
+								if (dx >= 1)
+								{
+									deltasum += 1;
+									rsum += r * a;
+									gsum += g * a;
+									bsum += b * a;
+									asum += a;
+								}
+								else
+								{
+									adx = a * dx;
+									rsum += r * adx;
+									gsum += g * adx;
+									bsum += b * adx;
+									asum += adx;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(rsum / asum + 0.5);
+							*(dst++) = (byte)(gsum / asum + 0.5);
+							*(dst++) = (byte)(bsum / asum + 0.5);
+							*(dst++) = (byte)(asum / delta + 0.5);
+						}
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				fixed(byte* _dst=ret.imageData, _src=imageData)
+				{
+					byte* dst = _dst;
+					uint wb = Width * 2;
+
+					for (uint y = 0; y < Height; y++)
+					{
+						byte* src = _src + y * wb;
+
+						for (uint x = 0; x < w; x++)
+						{
+							double deltax = x * delta;
+							double dx = 1 - (deltax - ((uint)deltax));
+							byte* s = src + ((uint)deltax) * 2;
+							double deltasum = dx;
+
+							byte g = *(s++);
+							uint a = *(s++);
+
+							double gsum = g * dx * a;
+							double asum = a * dx;
+
+							while ((delta - deltasum) > 0.0001)
+							{
+								dx = delta - deltasum;
+								g = *(s++);
+								a = *(s++);
+								if (dx >= 1)
+								{
+									deltasum += 1;
+									gsum += g * a;
+									asum += a;
+								}
+								else
+								{
+									double adx = a * dx;
+									gsum += g * adx;
+									asum += adx;
+									break;
+								}
+							}
+
+							*(dst++) = (byte)(gsum / asum + 0.5);
+							*(dst++) = (byte)(asum / delta + 0.5);
+						}
+					}
+				}
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
+		}
+		#endregion
+
 		#region Drawing methods
 		/// <summary>
 		/// Draw the specified x, y and source.
@@ -1190,6 +1694,382 @@ namespace Xevle.Imaging.Image
 						break;
 					}
 			}
+		}
+		#endregion
+
+		#region ReduceByN
+		public Image8i ReduceBy(uint m, uint n)
+		{
+			if (m == 1 && n == 1) return this;
+			if ((m * n) == 0) return new Image8i(0, 0, ChannelFormat);
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+
+			uint wr = Width % m, hr = Height % n;
+			uint wm = Width / m, hn = Height / n;
+
+			if (wm == 0) wm = 1;
+
+			if (hn == 0) hn = 1;
+
+			if (wr != 0)
+			{
+				if (hr != 0) return Downsample(wm, hn);
+				if (n == 1) return DownsampleHorizontal(wm);
+				return ReduceByVertical(n).DownsampleHorizontal(wm); // ReduceBy is usually faster, so ist down first
+			}
+
+			if (hr != 0)
+			{
+				if (m == 1) return DownsampleVertical(hn);
+				return ReduceByHorizontal(m).DownsampleVertical(hn); // ReduceBy is usually faster, so ist down first
+			}
+
+			if (m == 1) return ReduceByVertical(n);
+			if (n == 1) return ReduceByHorizontal(m);
+
+			if ((hn * Width) > (wm * Height)) return ReduceByHorizontal(m).ReduceByVertical(n);
+			return ReduceByVertical(n).ReduceByHorizontal(m);
+		}
+
+		public Image8i ReduceBy(uint m)
+		{
+			if (m == 1) return this;
+			if (m == 0) return new Image8i(0, 0, ChannelFormat);
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+
+			uint wr = Width % m, hr = Height % m;
+			uint wm = Width / m, hn = Height / m;
+
+			if (wm == 0) wm = 1;
+
+			if (hn == 0) hn = 1;
+
+			if (wr != 0)
+			{
+				if (hr != 0) return Downsample(wm, hn);
+				if (m == 1) return DownsampleHorizontal(wm);
+				return ReduceByVertical(m).DownsampleHorizontal(wm); // ReduceBy is usually faster, so ist down first
+			}
+
+			if (hr != 0)
+			{
+				if (m == 1) return DownsampleVertical(hn);
+				return ReduceByHorizontal(m).DownsampleVertical(hn); // ReduceBy is usually faster, so ist down first
+			}
+
+			if ((hn * Width) > (wm * Height)) return ReduceByHorizontal(m).ReduceByVertical(m);
+			return ReduceByVertical(m).ReduceByHorizontal(m);
+		}
+
+		Image8i ReduceByVertical(uint n)
+		{
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			uint h = Height / n;
+
+			if (ChannelFormat == ChannelFormat.GRAY)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					byte[] dst = ret.imageData;
+					uint ind = x;
+					byte[] src = imageData;
+					uint inds = x;
+
+					for (uint y = 0; y < h; y++)
+					{
+						uint sum = 0;
+						for (uint z = 0; z < n; z++)
+						{
+							sum += src[inds];
+							inds += Width;
+						}
+
+						dst[ind] = (byte)(sum / n);
+						ind += Width;
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.BGR)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint wb = 3 * Width - 2;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					byte[] dst = ret.imageData;
+					uint ind = x * 3;
+					byte[] src = imageData;
+					uint inds = x * 3;
+
+					for (uint y = 0; y < h; y++)
+					{
+						uint sumr = 0, sumg = 0, sumb = 0;
+
+						for (uint z = 0; z < n; z++)
+						{
+							sumr += src[inds++];
+							sumg += src[inds++];
+							sumb += src[inds];
+							inds += wb;
+						}
+
+						dst[ind++] = (byte)(sumr / n);
+						dst[ind++] = (byte)(sumg / n);
+						dst[ind] = (byte)(sumb / n);
+						ind += wb;
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGBA || ChannelFormat == ChannelFormat.BGRA)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint wb = 4 * Width - 3;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					byte[] dst = ret.imageData;
+					uint ind = x * 4;
+					byte[] src = imageData;
+					uint inds = x * 4;
+
+					for (uint y = 0; y < h; y++)
+					{
+						uint sumr = 0, sumg = 0, sumb = 0, suma = 0;
+
+						for (uint z = 0; z < n; z++)
+						{
+							byte r = src[inds++];
+							byte g = src[inds++];
+							byte b = src[inds++];
+							uint a = src[inds];
+							inds += wb;
+							sumr += r * a;
+							sumg += g * a;
+							sumb += b * a;
+							suma += a;
+						}
+
+						if (suma == 0)
+						{
+							dst[ind++] = 0;
+							dst[ind++] = 0;
+							dst[ind++] = 0;
+							dst[ind] = 0;
+						}
+						else
+						{
+							dst[ind++] = (byte)(sumr / suma);
+							dst[ind++] = (byte)(sumg / suma);
+							dst[ind++] = (byte)(sumb / suma);
+							dst[ind] = (byte)(suma / n);
+						}
+
+						ind += wb;
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				Image8i ret = new Image8i(Width, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint wb = 2 * Width - 1;
+
+				for (uint x = 0; x < Width; x++)
+				{
+					byte[] dst = ret.imageData;
+					uint ind = x * 2;
+					byte[] src = imageData;
+					uint inds = x * 2;
+
+					for (uint y = 0; y < h; y++)
+					{
+						uint sumg = 0, suma = 0;
+
+						for (uint z = 0; z < n; z++)
+						{
+							byte g = src[inds++];
+							uint a = src[inds];
+							inds += wb;
+							sumg += g * a;
+							suma += a;
+						}
+
+						if (suma == 0)
+						{
+							dst[ind++] = 0;
+							dst[ind] = 0;
+						}
+						else
+						{
+							dst[ind++] = (byte)(sumg / suma);
+							dst[ind] = (byte)(suma / n);
+						}
+
+						ind += wb;
+					}
+				}
+
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
+		}
+
+		Image8i ReduceByHorizontal(uint m)
+		{
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			uint w = Width / m;
+			uint wh = w * Height;
+
+			if (ChannelFormat == ChannelFormat.GRAY)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				byte[] dst = ret.imageData;
+				uint ind = 0;
+				byte[] src = imageData;
+				uint inds = 0;
+
+				for (uint y = 0; y < wh; y++)
+				{
+					uint sum = 0;
+					for (uint z = 0; z < m; z++) sum += src[inds++];
+					dst[ind++] = (byte)(sum / m);
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.BGR)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				byte[] dst = ret.imageData;
+				uint ind = 0;
+				byte[] src = imageData;
+				uint inds = 0;
+
+				for (uint y = 0; y < wh; y++)
+				{
+					uint sumr = 0, sumg = 0, sumb = 0;
+
+					for (uint z = 0; z < m; z++)
+					{
+						sumr += src[inds++];
+						sumg += src[inds++];
+						sumb += src[inds++];
+					}
+
+					dst[ind++] = (byte)(sumr / m);
+					dst[ind++] = (byte)(sumg / m);
+					dst[ind++] = (byte)(sumb / m);
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.RGBA || ChannelFormat == ChannelFormat.BGRA)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				byte[] dst = ret.imageData;
+				uint ind = 0;
+				byte[] src = imageData;
+				uint inds = 0;
+
+				for (uint y = 0; y < wh; y++)
+				{
+					uint sumr = 0, sumg = 0, sumb = 0, suma = 0;
+
+					for (uint z = 0; z < m; z++)
+					{
+						byte r = src[inds++];
+						byte g = src[inds++];
+						byte b = src[inds++];
+						uint a = src[inds++];
+						sumr += r * a;
+						sumg += g * a;
+						sumb += b * a;
+						suma += a;
+					}
+
+					if (suma == 0)
+					{
+						dst[ind++] = 0;
+						dst[ind++] = 0;
+						dst[ind++] = 0;
+						dst[ind++] = 0;
+					}
+					else
+					{
+						dst[ind++] = (byte)(sumr / suma);
+						dst[ind++] = (byte)(sumg / suma);
+						dst[ind++] = (byte)(sumb / suma);
+						dst[ind++] = (byte)(suma / m);
+					}
+				}
+
+				return ret;
+			}
+
+			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				byte[] dst = ret.imageData;
+				uint ind = 0;
+				byte[] src = imageData;
+				uint inds = 0;
+
+				for (uint y = 0; y < wh; y++)
+				{
+					uint sumg = 0, suma = 0;
+
+					for (uint z = 0; z < m; z++)
+					{
+						byte g = src[inds++];
+						uint a = src[inds++];
+						sumg += g * a;
+						suma += a;
+					}
+
+					if (suma == 0)
+					{
+						dst[ind++] = 0;
+						dst[ind++] = 0;
+					}
+					else
+					{
+						dst[ind++] = (byte)(sumg / suma);
+						dst[ind++] = (byte)(suma / m);
+					}
+				}
+
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
 		}
 		#endregion
 	}
