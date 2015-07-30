@@ -1576,6 +1576,241 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region NearestPixelResize
+		public Image8i NearestPixelResize(uint w, uint h)
+		{
+			if (Width == w && Height == h) return this;
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			if ((w * h) == 0) return new Image8i(0, 0, ChannelFormat);
+
+			if (Width == w) return NearestPixelResizeVertical(h);
+			if (Height == h) return NearestPixelResizeHorizontal(w);
+			return NearestPixelResizeVerticalHorizontal(w, h);
+		}
+
+		Image8i NearestPixelResizeVertical(uint h)
+		{
+			double delta = (double)Height / h;
+
+			Image8i ret = new Image8i(Width, h, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Width * bpp;
+
+			uint dst = 0;
+
+			for (uint y = 0; y < h; y++)
+			{
+				uint src = ((uint)(y * delta + delta / 2)) * bw;
+				for (uint i = 0; i < bw; i++) ret.imageData[dst++] = imageData[src++];
+			}
+
+			return ret;
+		}
+
+		Image8i NearestPixelResizeHorizontal(uint w)
+		{
+			double delta = (double)Width / w;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			uint[] dx = new uint[w];
+			for (uint x = 0; x < w; x++) dx[x] = (uint)(x * delta + delta / 2);
+
+			if (bpp == 1)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint dst = 0;
+
+				for (uint y = 0; y < Height; y++)
+				{
+					uint src = y * Width;
+					for (uint x = 0; x < w; x++) ret.imageData[dst++] = imageData[src + dx[x]];
+				}
+
+				return ret;
+			}
+
+			if (bpp == 4)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint bw = Width * 4;
+				uint dst = 0;
+
+				for (uint y = 0; y < Height; y++)
+				{
+					uint src = y * bw;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 4;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			if (bpp == 3)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint bw = Width * 3;
+				uint dst = 0;
+
+				for (uint y = 0; y < Height; y++)
+				{
+					uint src = y * bw;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 3;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			if (bpp == 2)
+			{
+				Image8i ret = new Image8i(w, Height, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint bw = Width * 2;
+				uint dst = 0;
+
+				for (uint y = 0; y < Height; y++)
+				{
+					uint src = y * bw;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 2;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
+		}
+
+		Image8i NearestPixelResizeVerticalHorizontal(uint w, uint h)
+		{
+			double deltah = (double)Height / h;
+			double deltaw = (double)Width / w;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			uint[] dx = new uint[w];
+			for (uint x = 0; x < w; x++) dx[x] = (uint)(x * deltaw + deltaw / 2);
+
+			if (bpp == 1)
+			{
+				Image8i ret = new Image8i(w, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint dst = 0;
+
+				for (uint y = 0; y < h; y++)
+				{
+					uint src = (uint)(y * deltah + deltah / 2) * Width;
+					for (uint x = 0; x < w; x++) ret.imageData[dst++] = imageData[src + dx[x]];
+				}
+
+				return ret;
+			}
+
+			if (bpp == 4)
+			{
+				Image8i ret = new Image8i(w, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint dst = 0;
+				uint w4 = Width * 4;
+
+				for (uint y = 0; y < h; y++)
+				{
+					uint src = (uint)(y * deltah + deltah / 2) * w4;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 4;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			if (bpp == 3)
+			{
+				Image8i ret = new Image8i(w, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint dst = 0;
+				uint w3 = Width * 3;
+
+				for (uint y = 0; y < h; y++)
+				{
+					uint src = (uint)(y * deltah + deltah / 2) * w3;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 3;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			if (bpp == 2)
+			{
+				Image8i ret = new Image8i(w, h, ChannelFormat);
+				if (ret.imageData == null) return ret;
+
+				uint dst = 0;
+				uint w2 = Width * 2;
+
+				for (uint y = 0; y < h; y++)
+				{
+					uint src = (uint)(y * deltah + deltah / 2) * w2;
+
+					for (uint x = 0; x < w; x++)
+					{
+						uint s = src + dx[x] * 2;
+						ret.imageData[dst++] = imageData[s++];
+						ret.imageData[dst++] = imageData[s];
+					}
+				}
+
+				return ret;
+			}
+
+			return new Image8i(0, 0, ChannelFormat);
+		}
+		#endregion
+
 		#region Pixel methods
 		/// <summary>
 		/// Gets the pixel.
