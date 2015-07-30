@@ -42,7 +42,8 @@ namespace Xevle.Imaging.Image
 		/// <param name="width">Width.</param>
 		/// <param name="height">Height.</param>
 		/// <param name="format">Format.</param>
-		public Image8i(uint width, uint height, ChannelFormat format = ChannelFormat.RGB, byte[] imageData=null)
+		/// <param name="imageData">Image data.</param>
+		public Image8i(uint width, uint height, ChannelFormat format = ChannelFormat.RGB, byte[] imageData = null)
 		{
 			Width = width;
 			Height = height;
@@ -57,10 +58,10 @@ namespace Xevle.Imaging.Image
 
 		#region Channel converter
 		/// <summary>
-		/// Converts to
+		/// Converts to.
 		/// </summary>
 		/// <returns>The to.</returns>
-		/// <param name="trgformat">Trgformat.</param>
+		/// <param name="channelFormat">Channel format.</param>
 		public Image8i ConvertTo(ChannelFormat channelFormat)
 		{
 			switch (channelFormat)
