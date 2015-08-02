@@ -21,7 +21,6 @@ namespace Xevle.Imaging.Image.Formats
 		{
 			#region Variables
 			// Header
-			int bfSize;								// Size of bitmap file in byte (unreliable)
 			int bfOffBits;		    				// Offset of image data in byte from start of file
 
 			// Information block
@@ -31,11 +30,7 @@ namespace Xevle.Imaging.Image.Formats
 			short biPlanes;							// on PCX number of color layers on windows bitmap always 1 (not used)
 			short biBitCount;						// Color depth (1, 4, 8, 16, 24, 32 Bit)
 			BitmapBitCompression biCompression;		// Compression method
-			uint biSizeImage;						// Size of image data (or zero (0))
-			int biXPelsPerMeter;					// horizontal resolution of target device in pixel
-			int biYPelsPerMeter;					// vertical resolution of target device in pixel
 			uint biClrUsed;							// Colors
-			uint biClrImportant;					// Important Color
 
 			// Misc things in info block
 			uint bmRed = 0;		// Color mask red
@@ -57,7 +52,7 @@ namespace Xevle.Imaging.Image.Formats
 				fileReader.Read(buffer, 0, 2);
 				if (buffer[0] != 'B' && buffer[0] != 'M') throw new InvalidDataException();
 
-				bfSize = fileReader.ReadInt32();
+				fileReader.ReadInt32(); // bfSize
 				fileReader.BaseStream.Seek(10, SeekOrigin.Begin);	// skip bfReserved
 				bfOffBits = fileReader.ReadInt32();
 				#endregion
@@ -74,10 +69,7 @@ namespace Xevle.Imaging.Image.Formats
 
 					// static defined
 					biCompression = BitmapBitCompression.BI_RGB;
-					biSizeImage = (uint)(bfSize - 26); // Size of image data (or zero (0))
-					biXPelsPerMeter = 2835; // 1000 DPI
-					biYPelsPerMeter = 2835; // 1000 DPI
-
+		
 					if (biBitCount == 1 || biBitCount == 4 || biBitCount == 8)
 					{
 						int CountColors = 1 << biBitCount; // 2^biBitCount
@@ -109,12 +101,12 @@ namespace Xevle.Imaging.Image.Formats
 
 					biCompression = (BitmapBitCompression)fileReader.ReadUInt32();
 
-					biSizeImage = fileReader.ReadUInt32();
-					biXPelsPerMeter = fileReader.ReadInt32();
-					biYPelsPerMeter = fileReader.ReadInt32();
+					fileReader.ReadUInt32(); // size image
+					fileReader.ReadInt32(); // resolution x
+					fileReader.ReadInt32(); // resolution y
 
 					biClrUsed = fileReader.ReadUInt32();
-					biClrImportant = fileReader.ReadUInt32();
+					fileReader.ReadUInt32(); // important color
 
 					if (biSize == 64) fileReader.BaseStream.Seek(24, SeekOrigin.Current); // Rest of OS/2 2.x header
 
@@ -343,7 +335,6 @@ namespace Xevle.Imaging.Image.Formats
 						else ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGB);
 
 						int BytesPerRow = (biWidth * 2);
-						int rest = (int)(Statics.Align((uint)BytesPerRow, 4) - BytesPerRow);
 
 						int ind = 0;
 						buffer = new byte[BytesPerRow];
