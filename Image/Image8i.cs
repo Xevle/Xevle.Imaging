@@ -4,6 +4,7 @@ using Xevle.Maths.Tuples;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Drawing.Text;
 
 namespace Xevle.Imaging.Image
 {
@@ -2900,6 +2901,51 @@ namespace Xevle.Imaging.Image
 			}
 
 			return new Image8i(0, 0, ChannelFormat);
+		}
+		#endregion
+
+		#region Text
+		public static Image8i RenderText(string text, Font font, Color color)
+		{
+			// calculate image dimensions
+			Bitmap bmp = new Bitmap(1, 1);
+			Graphics _g = Graphics.FromImage(bmp);
+			SizeF textSize = _g.MeasureString(text, font);
+
+			// This is where the bitmap size is determined.
+			int _imageWidth = Convert.ToInt32(textSize.Width) + 1;
+			int _imageHeight = Convert.ToInt32(textSize.Height) + 1;
+
+			_g = null;
+			bmp = null;
+
+			// Initialize bitmap and graphics
+			bmp = new Bitmap(_imageWidth, _imageHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+			_g = Graphics.FromImage(bmp);
+			_g.Clear(Color.Transparent);
+
+			// settings
+			_g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.AssumeLinear;
+			_g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+			_g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+			_g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+			// draw text
+			_g.DrawString(text, font, new SolidBrush(color), new Point(0, 0));
+
+			return Image8i.FromBitmap(bmp);
+		}
+
+		public static Image8i RenderText(string text, string filename, int size, Color color)
+		{
+			PrivateFontCollection pfc = new PrivateFontCollection();
+			pfc.AddFontFile(filename);
+			FontFamily fontfam = pfc.Families[0];
+
+			Font font = new Font(fontfam, size);
+
+			return RenderText(text, font, color);
 		}
 		#endregion
 
