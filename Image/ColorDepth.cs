@@ -9,6 +9,7 @@ namespace Xevle.Imaging.Image
 	{
 		Integer8Bit,
 		Integer16Bit,
+		Integer24Bit,
+		Integer32Bit
 	}
 }
-

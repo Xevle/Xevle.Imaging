@@ -5,9 +5,9 @@ using System.IO;
 namespace Xevle.Imaging.Image.Formats
 {
 	/// <summary>
-	/// Reader and writer class for Truevision image.
+	/// Reader and writer class for Targa Image
 	/// </summary>
-	public static class TruevisionImage
+	public static class TargaImage
 	{
 		public static Image8i FromFile(string filename)
 		{
@@ -24,7 +24,7 @@ namespace Xevle.Imaging.Image.Formats
 
 				BinaryReader br = new BinaryReader(fs);
 
-				// Read Header (18 bytes)
+				// Read header (18 bytes)
 				byte idLength = br.ReadByte();
 				byte colorMapType = br.ReadByte();
 				byte imageType = br.ReadByte();
@@ -79,7 +79,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 4;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (RGB).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (RGB).");
 
 							break;
 						}
@@ -92,7 +92,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 4;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (RGB).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (RGB).");
 
 							break;
 						}
@@ -106,7 +106,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 2;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (GRAY).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (GRAY).");
 
 							break;
 						}
@@ -120,7 +120,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 2;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (GRAY).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (GRAY).");
 
 							break;
 						}
@@ -132,7 +132,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 2;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (GRAY).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (GRAY).");
 
 							break;
 						}
@@ -144,7 +144,7 @@ namespace Xevle.Imaging.Image.Formats
 								bitsPerPixel = 2;
 								isAlpha = true;
 							}
-							else throw new Exception("Illegal or unsupported Pixel Depth (GRAY).");
+							else throw new InvalidDataException("Illegal or unsupported Pixel Depth (GRAY).");
 
 							break;
 						}
@@ -155,8 +155,8 @@ namespace Xevle.Imaging.Image.Formats
 				}
 
 				// Check header width and height an set to image variables
-				if (headerWidth == 0) throw new Exception("Illegal Image Width.");
-				if (headerHeight == 0) throw new Exception("Illegal Image Height.");
+				if (headerWidth == 0) throw new InvalidDataException("Illegal Image Width.");
+				if (headerHeight == 0) throw new InvalidDataException("Illegal Image Height.");
 
 				width = headerWidth;
 				height = headerHeight;

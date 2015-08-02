@@ -1,5 +1,9 @@
 ﻿using System;
 using System.IO;
+using Xevle.Maths.Tuples;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Xevle.Imaging.Image
 {
@@ -21,6 +25,26 @@ namespace Xevle.Imaging.Image
 		/// </summary>
 		/// <value>The channel format.</value>
 		public ChannelFormat ChannelFormat { get; private set; }
+
+		/// <summary>
+		/// Gets the color depth.
+		/// </summary>
+		/// <value>The color depth.</value>
+		public ColorDepth ColorDepth
+		{
+			get
+			{
+				return ColorDepth.Integer8Bit;
+			}
+		}
+
+		public byte[] ImageData
+		{
+			get
+			{
+				return ImageData;
+			}
+		}
 
 		/// <summary>
 		/// Gets the width.
@@ -53,6 +77,143 @@ namespace Xevle.Imaging.Image
 			this.imageData = imageData;
 	
 			if (width * height > 0) imageData = new byte[width * height * GetBytePerPixelFromChannelFormat(format)];
+		}
+		#endregion
+
+		#region Bitmap interoperable
+		public static Image8i FromBitmap(Bitmap bmp)
+		{
+			Image8i ret = null;
+
+			uint width = (uint)bmp.Width;
+			uint height = (uint)bmp.Height;
+
+			if ((bmp.PixelFormat & PixelFormat.Alpha) == PixelFormat.Alpha)
+			{
+				ret = new Image8i(width, height, ChannelFormat.RGBA);
+
+				BitmapData data = bmp.LockBits(new Rectangle(0, 0, (int)width, (int)height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+				Marshal.Copy(data.Scan0, ret.imageData, 0, (int)(width * height * 4));
+				bmp.UnlockBits(data);
+			}
+			else
+			{
+				ret = new Image8i(width, height, ChannelFormat.RGB);
+
+				BitmapData data = bmp.LockBits(new Rectangle(0, 0, (int)width, (int)height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+				if (((int)width * 3) == data.Stride)
+				{
+					Marshal.Copy(data.Scan0, ret.imageData, 0, (int)(width * height * 3));
+				}
+				else
+				{
+					if (IntPtr.Size == 4)
+					{
+						for (uint i = 0; i < height; i++)
+						{
+							Marshal.Copy((IntPtr)(data.Scan0.ToInt32() + (int)(i * data.Stride)), ret.imageData, (int)(width * 3 * i), (int)(width * 3));
+						}
+					}
+					else if (IntPtr.Size == 8)
+					{
+						for (uint i = 0; i < height; i++)
+						{
+							Marshal.Copy((IntPtr)(data.Scan0.ToInt64() + (long)(i * data.Stride)), ret.imageData, (int)(width * 3 * i), (int)(width * 3));
+						}
+					}
+				}
+
+				bmp.UnlockBits(data);
+				data = null;
+				bmp.Dispose();
+				bmp = null;
+			}
+
+			return ret;
+		}
+
+		public Bitmap ToBitmap()
+		{
+			Image8i intern = null;
+
+			switch (ChannelFormat)
+			{
+				case ChannelFormat.GRAY:
+					{
+						intern = ConvertToRGB();
+						break;
+					}
+				case ChannelFormat.GRAYAlpha:
+					{
+						intern = ConvertToRGBA();
+						break;
+					}
+				case ChannelFormat.RGB:
+					{
+						intern = ConvertToRGB();
+						break;
+					}
+				case ChannelFormat.BGR:
+					{
+						intern = ConvertToRGB();
+						break;
+					}
+				case ChannelFormat.RGBA:
+					{
+						intern = ConvertToRGBA();
+						break;
+					}
+				case ChannelFormat.BGRA:
+					{
+						intern = ConvertToRGBA();
+						break;
+					}
+			}
+
+			if (intern == null) throw new Exception("Null image can't be converted.");
+
+			if (intern.ChannelFormat == ChannelFormat.RGBA)
+			{
+				Bitmap bmp = new Bitmap((int)Width, (int)Height, PixelFormat.Format32bppArgb);
+				BitmapData data = bmp.LockBits(new Rectangle(0, 0, (int)Width, (int)Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+				Marshal.Copy(intern.imageData, 0, data.Scan0, (int)(Width * Height * 4));
+
+				bmp.UnlockBits(data);
+				data = null;
+				return bmp;
+			}
+			else
+			{
+				Bitmap bmp = new Bitmap((int)Width, (int)Height, PixelFormat.Format24bppRgb);
+				BitmapData data = bmp.LockBits(new Rectangle(0, 0, (int)Width, (int)Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+				if (((int)Width * 3) == data.Stride)
+				{
+					Marshal.Copy(intern.imageData, 0, data.Scan0, (int)(Width * Height * 3));
+				}
+				else
+				{
+					if (IntPtr.Size == 4)
+					{
+						for (uint i = 0; i < Height; i++)
+						{
+							Marshal.Copy(intern.imageData, (int)(Width * 3 * i), (IntPtr)(data.Scan0.ToInt32() + (int)(i * data.Stride)), (int)(Width * 3));
+						}
+					}
+					else if (IntPtr.Size == 8)
+					{
+						for (uint i = 0; i < Height; i++)
+						{
+							Marshal.Copy(intern.imageData, (int)(Width * 3 * i), (IntPtr)(data.Scan0.ToInt64() + (long)(i * data.Stride)), (int)(Width * 3));
+						}
+					}
+				}
+
+				bmp.UnlockBits(data);
+				data = null;
+				return bmp;
+			}
 		}
 		#endregion
 
@@ -748,6 +909,67 @@ namespace Xevle.Imaging.Image
 			}
 
 			return ret;
+		}
+		#endregion
+
+		#region Circle & CircleFilled
+		public void Circle(int x0, int y0, uint radius, Color8i color)
+		{
+			int f = 1 - (int)radius;
+			int ddF_x = 0;
+			int ddF_y = -2 * (int)radius;
+			int x = 0;
+			int y = (int)radius;
+
+			SetPixel(x0, y0 + (int)radius, color);
+			SetPixel(x0, y0 - (int)radius, color);
+			SetPixel(x0 + (int)radius, y0, color);
+			SetPixel(x0 - (int)radius, y0, color);
+
+			while (x < y)
+			{
+				if (f >= 0)
+				{
+					y--;
+					ddF_y += 2;
+					f += ddF_y;
+				}
+				x++;
+				ddF_x += 2;
+				f += ddF_x + 1;
+
+				SetPixel(x0 + x, y0 + y, color);
+				SetPixel(x0 - x, y0 + y, color);
+				SetPixel(x0 + x, y0 - y, color);
+				SetPixel(x0 - x, y0 - y, color);
+				SetPixel(x0 + y, y0 + x, color);
+				SetPixel(x0 - y, y0 + x, color);
+				SetPixel(x0 + y, y0 - x, color);
+				SetPixel(x0 - y, y0 - x, color);
+			}
+		}
+
+		public void CircleFilled(int x0, int y0, uint radius, Color8i color)
+		{
+			for (int i = x0 - (int)radius; i <= x0 + radius; i++)
+			{
+				for (int k = y0 - (int)radius; k <= y0 + radius; k++)
+				{
+					// check if point in image
+					if (i < 1 | i > Width - 1) continue;
+					if (k < 1 | k > Height - 1) continue;
+			
+					// calc distance
+					Tuple2is a=new Tuple2is(x0, y0);
+					Tuple2is b=new Tuple2is(i, k);
+					double distance = a % b;
+
+					if (radius > distance)
+					{
+						SetPixel(i, k, color);
+					}
+				}
+			}
 		}
 		#endregion
 
@@ -1598,6 +1820,84 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region FillWithMandelbrot
+		public void FillWithMandelbrot()
+		{
+			FillWithMandelbrot(-2.0, -1.6, 1, 1.6, 255);
+		}
+
+		/// <summary>
+		/// Fills the with mandelbrot.
+		/// </summary>
+		/// <param name="x1">Cut of graphic.</param>
+		/// <param name="y1">Cut of graphic.</param>
+		/// <param name="x2">Cut of graphic.</param>
+		/// <param name="y2">Cut of graphic.</param>
+		/// <param name="depth">Calc depth.</param>
+		public void FillWithMandelbrot(double x1, double y1, double x2, double y2, byte depth)
+		{
+			int d; // Counter for depth
+			double dx, dy; // Increment per pixel
+			double px, py; // current word coordinate
+			double u, v; // calculation variables
+			double ax, ay; // calculation variables
+
+			Color8i[] c = new Color8i[256];
+
+			// create random colors
+			Random randomColors = new Random();
+
+			for (int i = 0; i < 256; i++)
+			{
+				c[i] = new Color8i((byte)randomColors.Next(255), (byte)randomColors.Next(255), (byte)randomColors.Next(255));
+			}
+
+			dx = (x2 - x1) / Width;
+			dy = (y2 - y1) / Height;
+
+			// create the image
+			for (uint y = 0; y < Height; y++)
+			{
+				for (uint x = 0; x < Width; x++)
+				{
+					px = x1 + x * dx;
+					py = y1 + y * dy;
+					d = 0;
+					ax = 0;
+					ay = 0;
+
+					do
+					{
+						u = ax * ax - ay * ay + px;
+						v = 2 * ax * ay + py;
+						ax = u;
+						ay = v;
+						d++;
+					}
+					while(!(ax * ax + ay * ay > 8 || d == depth));
+
+					SetPixel(x, y, c[d]);
+				}
+			}
+		}
+		#endregion
+
+		#region FillWithTestPattern
+		public void FillWithTestPattern()
+		{
+			Fill(Color8i.Red);
+			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 32), Color8i.Green);
+			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 16), Color8i.Blue);
+			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 8), Color8i.Yellow);
+
+			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 8), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 8), Color8i.Red);
+			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 16), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 16), Color8i.Green);
+			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 24), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 24), Color8i.Blue);
+			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 32), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 32), Color8i.Black);
+			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 40), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 40), Color8i.White);
+		}
+		#endregion
+
 		#region GetImage and GetSubImage methods
 		/// <summary>
 		/// Gets the image.
@@ -1665,6 +1965,67 @@ namespace Xevle.Imaging.Image
 						return 1;
 					}
 			}
+		}
+		#endregion
+
+		#region Line, PolyLine & Polygon
+		public void Line(int xstart, int ystart, int xend, int yend, Color8i color)
+		{
+			//Initialisierung
+			int x, y, t, dist, xerr, yerr, dx, dy, incx, incy;
+
+			// Entfernung in beiden Dimensionen berechnen
+			dx = xend - xstart;
+			dy = yend - ystart;
+
+			// Vorzeichen des Inkrements bestimmen
+			if (dx < 0)
+			{
+				incx = -1;
+				dx = -dx;
+			}
+			else if (dx > 0) incx = 1;
+			else incx = 0;
+
+			if (dy < 0)
+			{
+				incy = -1;
+				dy = -dy;
+			}
+			else if (dy > 0) incy = 1;
+			else incy = 0;
+
+			// feststellen, welche Entfernung größer ist
+			dist = (dx > dy) ? dx : dy;
+
+			// Initialisierungen vor Schleifenbeginn
+			x = xstart;
+			y = ystart;
+			xerr = dx;
+			yerr = dy;
+
+			// Pixel berechnen
+			for (t = 0; t < dist; ++t)
+			{
+				SetPixel(x, y, color);
+
+				xerr += dx;
+				yerr += dy;
+
+				if (xerr > dist)
+				{
+					xerr -= dist;
+					x += incx;
+				}
+
+				if (yerr > dist)
+				{
+					yerr -= dist;
+					y += incy;
+				}
+			}
+
+			SetPixel(xend, yend, color);
 		}
 		#endregion
 
@@ -1964,6 +2325,11 @@ namespace Xevle.Imaging.Image
 			return new Color8i();
 		}
 
+		public void SetPixel(int x, int y, Color8i color)
+		{
+			SetPixel((uint)x, (uint)y, color);
+		}
+
 		/// <summary>
 		/// Sets the pixel.
 		/// </summary>
@@ -2020,6 +2386,143 @@ namespace Xevle.Imaging.Image
 						imageData[pos + 3] = color.A;
 						break;
 					}
+			}
+		}
+		#endregion
+
+		#region Rect & RectFilled
+		public void Rect(int x, int y, uint w, uint h, Color8i color)
+		{
+			Line(x, y, x + (int)w, y, color); // von 1 zu 2
+			Line(x + (int)w, y, x + (int)w, y + (int)h, color); // von 2 zu 3
+			Line(x + (int)w, y + (int)h, x, y + (int)h, color); // von 3 zu 4
+			Line(x, y + (int)h, x, y, color); // von 4 zu 1
+		}
+
+		public void RectFilled(int x, int y, uint w, uint h, Color8i color)
+		{
+			if (x >= Width || y >= Height) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			uint start = (uint)System.Math.Max(-x, 0);
+			uint end = (uint)System.Math.Min(w, Width - x);
+
+			uint jstart = (uint)System.Math.Max(-y, 0);
+			uint jend = (uint)System.Math.Min(h, Height - y);
+
+			unsafe
+			{
+				fixed(byte* dst_=imageData)
+				{
+					byte* dst__ = dst_ + x * bpp + start;
+
+					uint dw = Width * bpp;
+
+					if (ChannelFormat == ChannelFormat.GRAY)
+					{
+						byte g = color.R;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++) *dst++ = g;
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.RGB)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++)
+							{
+								*dst++ = b;
+								*dst++ = g;
+								*dst++ = r;
+							}
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.BGR)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++)
+							{
+								*dst++ = r;
+								*dst++ = g;
+								*dst++ = b;
+							}
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.RGBA)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						byte a = color.A;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++)
+							{
+								*dst++ = b;
+								*dst++ = g;
+								*dst++ = r;
+								*dst++ = a;
+							}
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.BGRA)
+					{
+						byte r = color.R;
+						byte g = color.G;
+						byte b = color.B;
+						byte a = color.A;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++)
+							{
+								*dst++ = r;
+								*dst++ = g;
+								*dst++ = b;
+								*dst++ = a;
+							}
+						}
+					}
+					else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+					{
+						byte g = color.R;
+						byte a = color.A;
+
+						for (uint j = jstart; j < jend; j++)
+						{
+							byte* dst = dst__ + dw * (y + j);
+
+							for (uint i = start; i < end; i++)
+							{
+								*dst++ = g;
+								*dst++ = a;
+							}
+						}
+					}
+				}
 			}
 		}
 		#endregion
@@ -2397,6 +2900,125 @@ namespace Xevle.Imaging.Image
 			}
 
 			return new Image8i(0, 0, ChannelFormat);
+		}
+		#endregion
+
+		#region Transformations
+		public Image8i ToFlippedHorizontal()
+		{
+			Image8i ret = new Image8i(Width, Height,ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bw = Width * GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			uint src = 0;
+			uint dst = Height * bw;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				dst -= bw;
+				for (uint x = 0; x < bw; x++) ret.imageData[dst++] = imageData[src++];
+				dst -= bw;
+			}
+
+			return ret;
+		}
+
+		public Image8i ToFlippedVertical()
+		{
+			Image8i ret = new Image8i(Width, Height, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Width * bpp;
+
+			uint src = 0;
+			uint dst = bw;
+			dst -= bpp;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				for (uint x = 0; x < Width; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					dst -= 2 * bpp;
+				}
+				dst += 2 * bw;
+			}
+
+			return ret;
+		}
+
+		public Image8i ToRot90()
+		{
+			Image8i ret = new Image8i(Height, Width, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Height * bpp;
+
+			uint src = 0;
+			uint dst_ = (Width - 1) * bw;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				uint dst = dst_;
+				for (uint x = 0; x < Width; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					dst -= bw + bpp;
+				}
+				dst_ += bpp;
+			}
+			return ret;
+		}
+
+		public Image8i ToRot180()
+		{
+			Image8i ret = new Image8i(Width, Height, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Width * bpp;
+
+			uint src = 0;
+			uint dst = Height * bw;
+			dst -= bpp;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				for (uint x = 0; x < Width; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					dst -= 2 * bpp;
+				}
+			}
+
+			return ret;
+		}
+
+		public Image8i ToRot270()
+		{
+			Image8i ret = new Image8i(Height, Width, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Width * bpp;
+
+			uint dst = 0;
+			uint src_ = (Height - 1) * bw;
+
+			for (uint y = 0; y < Width; y++)
+			{
+				uint src = src_;
+				for (uint x = 0; x < Height; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					src -= bw + bpp;
+				}
+				src_ += bpp;
+			}
+			return ret;
 		}
 		#endregion
 	}

@@ -43,13 +43,24 @@
     <Compile Include="Image\ChannelFormat.cs" />
     <Compile Include="Image\Statics.cs" />
     <Compile Include="Image\Color8i.cs" />
-    <Compile Include="Image\Formats\TruevisionImage.cs" />
+    <Compile Include="Image\PooledLoader.cs" />
+    <Compile Include="Image\Formats\FormatFromFile.cs" />
+    <Compile Include="Image\Formats\WindowsBitmap.cs" />
+    <Compile Include="Image\Formats\TargaImage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Xevle.IO\Xevle.IO.csproj">
       <Project>{FF1643AA-E194-4145-8248-028ED9503EB4}</Project>
       <Name>Xevle.IO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xevle.Maths\Xevle.Maths.csproj">
+      <Project>{69DDF62D-1B61-4B1E-8452-91436E0DAADB}</Project>
+      <Name>Xevle.Maths</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xevle.Core\Xevle.Core.csproj">
+      <Project>{4D90F3D7-F459-4272-A2FB-7A6B6987EA2D}</Project>
+      <Name>Xevle.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
