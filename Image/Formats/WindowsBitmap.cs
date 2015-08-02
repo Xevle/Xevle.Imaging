@@ -1045,5 +1045,60 @@ namespace Xevle.Imaging.Image.Formats
 
 			throw new NotSupportedException();
 		}
+
+		public static void ToFile(string filename, Image8i image)
+		{
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			{
+				ToFile(filename, image.ConvertToRGB());
+				return;
+			}
+
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				ToFile(filename, image.ConvertToRGBA());
+				return;
+			}
+
+			BinaryWriter fileWriter = new BinaryWriter(File.Open(filename, FileMode.Create));
+
+			#region Header
+			fileWriter.Write('B'); 		// Signature
+			fileWriter.Write('M'); 		// Signature
+			fileWriter.Write((uint)0); 	// Size of file //TODO add filesize
+			fileWriter.Write((uint)0); 	// Reserved
+			fileWriter.Write((uint)70); // Offset of image data
+			#endregion
+
+			#region Informationsblock
+			fileWriter.Write((uint)40); 			// Size of info block
+			fileWriter.Write((int)image.Width); 	// Image with
+			fileWriter.Write((int)image.Height); 	// Image height (top down image)
+			fileWriter.Write((ushort)1); 			// Planes (always one)
+
+			if (image.ChannelFormat == ChannelFormat.RGB) fileWriter.Write((ushort)24); // 24 Bit
+			else if (image.ChannelFormat == ChannelFormat.RGBA) fileWriter.Write((ushort)32); // 32 Bit
+
+			fileWriter.Write((uint)0); // Compression (BI_RGB / uncompressed)
+			fileWriter.Write((uint)0); // Size of image daza (can be zero)
+
+			fileWriter.Write((int)0); // horizontal resolution of output device in pixel per meter 
+			fileWriter.Write((int)0); // vertical resolution of output device in pixel per meter 
+
+			fileWriter.Write((uint)0); // biClrUsed (zero, no palette)
+			fileWriter.Write((uint)0); // biClrImportant (zero, no palette)
+			#endregion
+
+			#region RGB Quad
+			fileWriter.Write((uint)0); // blue
+			fileWriter.Write((uint)0); // green
+			fileWriter.Write((uint)0); // red
+			fileWriter.Write((uint)0); // reserved
+			#endregion
+
+			fileWriter.Write(image.GetImageDataWithGranularity(4));
+
+			fileWriter.Close();
+		}
 	}
 }

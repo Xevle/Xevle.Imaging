@@ -47,6 +47,34 @@ namespace Xevle.Imaging.Image
 			}
 		}
 
+		public byte[] GetImageDataWithGranularity(uint granularity)
+		{
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint wb = bpp * Width;
+			uint granwidth = Statics.Align(wb, granularity);
+			if (granwidth * Height == 0) return null;
+
+			if (wb == granwidth) return imageData;
+
+			byte[] ret = new byte[granwidth * Height];
+			if (ret == null) return ret;
+
+			byte[] dst = ret;
+			uint ind = 0;
+			byte[] src = imageData;
+			uint inds = 0;
+
+			uint granspare = (granwidth - wb);
+
+			for (uint y = 0; y < Height; y++)
+			{
+				for (uint i = 0; i < wb; i++) dst[ind++] = src[inds++];
+				for (uint i = 0; i < granspare; i++) dst[ind++] = 0;
+			}
+
+			return ret;
+		}
+
 		/// <summary>
 		/// Gets the width.
 		/// </summary>
@@ -2908,41 +2936,41 @@ namespace Xevle.Imaging.Image
 		public static Image8i RenderText(string text, Font font, Color color)
 		{
 			// calculate image dimensions
-			Bitmap bmp = new Bitmap(1, 1);
-			Graphics _g = Graphics.FromImage(bmp);
-			SizeF textSize = _g.MeasureString(text, font);
+			Bitmap bitmap = new Bitmap(1, 1);
+			Graphics graphics = Graphics.FromImage(bitmap);
+			SizeF textSize = graphics.MeasureString(text, font);
 
 			// This is where the bitmap size is determined.
-			int _imageWidth = Convert.ToInt32(textSize.Width) + 1;
-			int _imageHeight = Convert.ToInt32(textSize.Height) + 1;
+			int imageWidth = Convert.ToInt32(textSize.Width) + 1;
+			int imageHeight = Convert.ToInt32(textSize.Height) + 1;
 
-			_g = null;
-			bmp = null;
+			graphics = null;
+			bitmap = null;
 
 			// Initialize bitmap and graphics
-			bmp = new Bitmap(_imageWidth, _imageHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			bitmap = new Bitmap(imageWidth, imageHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-			_g = Graphics.FromImage(bmp);
-			_g.Clear(Color.Transparent);
+			graphics = Graphics.FromImage(bitmap);
+			graphics.Clear(Color.Transparent);
 
 			// settings
-			_g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.AssumeLinear;
-			_g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-			_g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-			_g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+			graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.AssumeLinear;
+			graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+			graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+			graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
 			// draw text
-			_g.DrawString(text, font, new SolidBrush(color), new Point(0, 0));
+			graphics.DrawString(text, font, new SolidBrush(color), new Point(0, 0));
 
-			return Image8i.FromBitmap(bmp);
+			return Image8i.FromBitmap(bitmap);
 		}
 
 		public static Image8i RenderText(string text, string filename, int size, Color color)
 		{
 			PrivateFontCollection pfc = new PrivateFontCollection();
 			pfc.AddFontFile(filename);
-			FontFamily fontfam = pfc.Families[0];
 
+			FontFamily fontfam = pfc.Families[0];
 			Font font = new Font(fontfam, size);
 
 			return RenderText(text, font, color);
