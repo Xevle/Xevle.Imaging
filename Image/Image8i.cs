@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Drawing.Text;
+using Xevle.Maths.Arithmetic;
 
 namespace Xevle.Imaging.Image
 {
@@ -2929,6 +2930,41 @@ namespace Xevle.Imaging.Image
 			}
 
 			return new Image8i(0, 0, ChannelFormat);
+		}
+		#endregion
+
+		#region Resize
+		public Image8i Resize(int w, int h)
+		{
+			return Resize((uint)w, (uint)h);
+		}
+
+		public Image8i Resize(uint w, uint h)
+		{
+			if (Width == w && Height == h) return this;
+			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
+			if ((w * h) == 0) return new Image8i(0, 0, ChannelFormat);
+
+			if (Width <= w && Height <= h) return NearestPixelResize(w, h);
+
+			if (Width > w && Height > h) return Downsample(w, h);
+
+			if (Width > w) return DownsampleHorizontal(w).NearestPixelResizeVertical(h);
+
+			return DownsampleVertical(h).NearestPixelResizeHorizontal(w);
+		}
+
+		public Image8i ResizeToPowerOf2()
+		{
+			return Resize(BinaryArithmetic.GetPowerOf2(Width), BinaryArithmetic.GetPowerOf2(Height));
+		}
+
+		public Image8i ResizeByWidth(double newWidth)
+		{
+			double sizeFactor = newWidth / Width;
+			double newHeight = sizeFactor * Height;
+
+			return Resize((uint)newWidth, (uint)newHeight);
 		}
 		#endregion
 
