@@ -242,7 +242,7 @@ namespace Xevle.Imaging.Image.Formats
 
 						while (ColorTable.Count < 16) ColorTable.Add(Color8i.Black);
 
-						if (biHeight > 0) // buttom-up Bild
+						if (biHeight > 0) // buttom-up image
 						{
 							for (int i = absHeight - 1; i >= 0; i--)
 							{
@@ -288,10 +288,10 @@ namespace Xevle.Imaging.Image.Formats
 						if (biBitCount == 32 || (biBitCount == 16 && (biCompression == BitmapBitCompression.BI_ALPHABITFIELDS || biCompression == BitmapBitCompression.BI_BITFIELDS))) ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGBA);
 						else ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGB);
 
-						int BytesPerRow = (int)Statics.Align((uint)biWidth, 4);
+						int bytesPerRow = (int)Statics.Align((uint)biWidth, 4);
 
 						int ind = 0;
-						buffer = new byte[BytesPerRow];
+						buffer = new byte[bytesPerRow];
 
 						while (ColorTable.Count < 256) ColorTable.Add(Color8i.Black);
 
@@ -334,10 +334,10 @@ namespace Xevle.Imaging.Image.Formats
 						if (biBitCount == 32 || (biBitCount == 16 && (biCompression == BitmapBitCompression.BI_ALPHABITFIELDS || biCompression == BitmapBitCompression.BI_BITFIELDS))) ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGBA);
 						else ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGB);
 
-						int BytesPerRow = (biWidth * 2);
+						int bytesPerRow = (biWidth * 2);
 
 						int ind = 0;
-						buffer = new byte[BytesPerRow];
+						buffer = new byte[bytesPerRow];
 
 						if (biHeight > 0) // buttom-up image
 						{
@@ -390,14 +390,14 @@ namespace Xevle.Imaging.Image.Formats
 						if (biBitCount == 32 || (biBitCount == 16 && (biCompression == BitmapBitCompression.BI_ALPHABITFIELDS || biCompression == BitmapBitCompression.BI_BITFIELDS))) ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGBA);
 						else ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGB);
 
-						int BytesPerRow = (biWidth * 3);
-						int rest = (int)(Statics.Align((uint)BytesPerRow, 4) - BytesPerRow);
+						int bytesPerRow = (biWidth * 3);
+						int rest = (int)(Statics.Align((uint)bytesPerRow, 4) - bytesPerRow);
 
 						if (biHeight > 0) // buttom-up image
 						{
 							for (int i = 0; i < absHeight; i++)
 							{
-								fileReader.Read(ret.ImageData, ret.ImageData.Length - (i + 1) * BytesPerRow, BytesPerRow);
+								fileReader.Read(ret.ImageData, ret.ImageData.Length - (i + 1) * bytesPerRow, bytesPerRow);
 								if (rest != 0) fileReader.BaseStream.Seek(rest, SeekOrigin.Current);
 							}
 						}
@@ -405,13 +405,13 @@ namespace Xevle.Imaging.Image.Formats
 						{
 							if (rest == 0)
 							{
-								fileReader.Read(ret.ImageData, 0, BytesPerRow * absHeight); // load the whole imahe
+								fileReader.Read(ret.ImageData, 0, bytesPerRow * absHeight); // load the whole imahe
 							}
 							else
 							{
 								for (int i = 0; i < absHeight; i++)
 								{
-									fileReader.Read(ret.ImageData, i * BytesPerRow, BytesPerRow);
+									fileReader.Read(ret.ImageData, i * bytesPerRow, bytesPerRow);
 									if (rest != 0) fileReader.BaseStream.Seek(rest, SeekOrigin.Current);
 								}
 							}
@@ -426,19 +426,19 @@ namespace Xevle.Imaging.Image.Formats
 						if (biBitCount == 32 || (biBitCount == 16 && (biCompression == BitmapBitCompression.BI_ALPHABITFIELDS || biCompression == BitmapBitCompression.BI_BITFIELDS))) ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGBA);
 						else ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGB);
 
-						int BytesPerRow = (biWidth * 4);
-						buffer = new byte[BytesPerRow];
+						int bytesPerRow = (biWidth * 4);
+						buffer = new byte[bytesPerRow];
 
 						if (biHeight > 0) // buttom-up image
 						{
 							for (int i = 0; i < absHeight; i++)
 							{
-								fileReader.Read(ret.ImageData, ret.ImageData.Length - (i + 1) * BytesPerRow, BytesPerRow);
+								fileReader.Read(ret.ImageData, ret.ImageData.Length - (i + 1) * bytesPerRow, bytesPerRow);
 							}
 						}
 						else if (biHeight < 0) // top-down image
 						{
-							fileReader.Read(ret.ImageData, 0, BytesPerRow * absHeight); // load the whole image
+							fileReader.Read(ret.ImageData, 0, bytesPerRow * absHeight); // load the whole image
 						}
 						#endregion
 					}
@@ -490,10 +490,10 @@ namespace Xevle.Imaging.Image.Formats
 									}
 								case 2: // move the corrent image position
 									{
-										byte vRight = fileReader.ReadByte();	// Verschiebung nach Rechts
+										byte vRight = fileReader.ReadByte();	// move right
 										if (vRight >= biWidth) throw new InvalidDataException("Bad RLE 8 coding.");
 
-										byte vDown = fileReader.ReadByte();	// Verschiebung nach Unten
+										byte vDown = fileReader.ReadByte();	// move down
 
 										int currentRow = index - lineCount * bytesPerRow;
 										if ((currentRow + vRight) >= biWidth) throw new InvalidDataException("Bad RLE 8 coding.");
@@ -703,9 +703,8 @@ namespace Xevle.Imaging.Image.Formats
 					#endregion
 				}
 				else if (biCompression == BitmapBitCompression.BI_BITFIELDS || biCompression == BitmapBitCompression.BI_ALPHABITFIELDS)
-				{ // Bitmasken
+				{
 					#region BI_BITFIELDS
-
 					// create return image
 					Image8i ret;
 					if (biBitCount == 32 || (biBitCount == 16 && (biCompression == BitmapBitCompression.BI_ALPHABITFIELDS || biCompression == BitmapBitCompression.BI_BITFIELDS))) ret = new Image8i((uint)biWidth, (uint)absHeight, ChannelFormat.RGBA);
@@ -713,7 +712,7 @@ namespace Xevle.Imaging.Image.Formats
 
 					if (biBitCount == 16)
 					{
-						#region Bitmasken checken
+						#region Check bit masks
 						bmRed &= 0xffff; // only 16 bit
 						bmGreen &= 0xffff;
 						bmBlue &= 0xffff;
