@@ -420,5 +420,57 @@ namespace Xevle.Imaging.Image.Formats
 
 			return new Image8i(width, height, format, imageData);
 		}
+
+		public static void ToFile(string filename, Image8i image)
+		{
+			if (filename == null) throw new Exception();
+			if (filename == "") throw new Exception();
+			if (image.Width == 0 || image.Height == 0) throw new Exception();
+			if (image.Width > 0xFFFF || image.Height > 0xFFFF) throw new Exception();
+
+			if (image.ChannelFormat == ChannelFormat.BGR)
+			{
+				ToFile(filename, image.ConvertToRGB());
+				return;
+			}
+
+			if (image.ChannelFormat == ChannelFormat.BGRA)
+			{
+				ToFile(filename, image.ConvertToRGBA());
+				return;
+			}
+
+			bool isRGB = (image.ChannelFormat == ChannelFormat.BGR || image.ChannelFormat == ChannelFormat.RGB || image.ChannelFormat == ChannelFormat.BGRA || image.ChannelFormat == ChannelFormat.RGBA);
+			bool isAlpha = (image.ChannelFormat == ChannelFormat.BGRA || image.ChannelFormat == ChannelFormat.RGBA || image.ChannelFormat == ChannelFormat.GRAYAlpha);
+
+			ulong size = (ulong)(18 + ((isRGB) ? (isAlpha ? 4 : 3) : (isAlpha ? 2 : 1)) * image.Width * image.Height); // Length of data
+			if (size > 0xFFFFFFFF) throw new Exception(); // image is to big
+
+			using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
+			{
+				BinaryWriter bw = new BinaryWriter(fs);
+
+				byte Pixel_Depth = (byte)(isRGB ? (isAlpha ? 32 : 24) : (isAlpha ? 16 : 8));
+				byte Image_Descriptor = (byte)(isAlpha ? 0x28 : 0x20);	// Field 5.6
+
+				// Write header (18 bytes)
+				bw.Write((byte)0);					// ID_Length
+				bw.Write((byte)0);					// Color_Map_Type
+				bw.Write((byte)(isRGB ? 2 : 3));	// Image_Type
+				bw.Write((ushort)0);				// First_Entry_Index
+				bw.Write((ushort)0);				// Color_Map_Length
+				bw.Write((byte)0);					// Color_Map_Entry_Size
+				bw.Write((ushort)0);				// X_Origin
+				bw.Write((ushort)0);				// Y_Origin
+				bw.Write((ushort)image.Width);		// Width
+				bw.Write((ushort)image.Height);		// Height
+				bw.Write(Pixel_Depth);				// Pixel_Depth
+				bw.Write(Image_Descriptor);			// Image_Descriptor
+
+				bw.Write(image.ImageData);
+				bw.Close();
+				fs.Close();
+			}
+		}
 	}
 }
