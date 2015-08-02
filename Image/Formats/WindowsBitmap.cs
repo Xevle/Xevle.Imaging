@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Xevle.Imaging.Image.Formats
 {
-	public class WindowsBitmap
+	public static class WindowsBitmap
 	{
 		enum BitmapBitCompression
 		{

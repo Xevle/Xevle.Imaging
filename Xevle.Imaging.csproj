@@ -44,9 +44,9 @@
     <Compile Include="Image\Statics.cs" />
     <Compile Include="Image\Color8i.cs" />
     <Compile Include="Image\PooledLoader.cs" />
-    <Compile Include="Image\Formats\FormatFromFile.cs" />
     <Compile Include="Image\Formats\WindowsBitmap.cs" />
     <Compile Include="Image\Formats\TargaImage.cs" />
+    <Compile Include="Image\Formats\FormatAdapter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
