@@ -43,15 +43,15 @@ namespace Xevle.Imaging.Image
 
 		public static Color8i DarkBlue = new Color8i(0, 0, 128);
 		public static Color8i DarkBrown = new Color8i(128, 64, 0);
-		public static Color8i DarkCyan = new Color8i(0,128,128);
+		public static Color8i DarkCyan = new Color8i(0, 128, 128);
 		public static Color8i DarkGray = new Color8i(64, 64, 64);
 		public static Color8i DarkGreen = new Color8i(0, 128, 0);
 		public static Color8i DarkMagenta = new Color8i(128, 0, 128);
 		public static Color8i DarkOrange = new Color8i(192, 96, 0);
 		public static Color8i DarkPink = new Color8i(192, 0, 128);
-		public static Color8i DarkRed = new Color8i(128,0,0);
+		public static Color8i DarkRed = new Color8i(128, 0, 0);
 		public static Color8i DarkViolet = new Color8i(128, 0, 192);
-		public static Color8i DarkYellow = new Color8i(128,128,0);
+		public static Color8i DarkYellow = new Color8i(128, 128, 0);
 
 		public static Color8i Gray = new Color8i(128, 128, 128);
 		public static Color8i Green = new Color8i(0, 255, 0);

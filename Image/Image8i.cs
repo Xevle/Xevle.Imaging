@@ -990,8 +990,8 @@ namespace Xevle.Imaging.Image
 					if (k < 1 | k > Height - 1) continue;
 			
 					// calc distance
-					Tuple2is a=new Tuple2is(x0, y0);
-					Tuple2is b=new Tuple2is(i, k);
+					Tuple2is a = new Tuple2is(x0, y0);
+					Tuple2is b = new Tuple2is(i, k);
 					double distance = a % b;
 
 					if (radius > distance)
@@ -3147,7 +3147,7 @@ namespace Xevle.Imaging.Image
 		#region Transformations
 		public Image8i ToFlippedHorizontal()
 		{
-			Image8i ret = new Image8i(Width, Height,ChannelFormat);
+			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.imageData == null) return ret;
 
 			uint bw = Width * GetBytePerPixelFromChannelFormat(ChannelFormat);
