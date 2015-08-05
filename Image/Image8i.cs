@@ -1998,6 +1998,72 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region Inverted, InvertedAlpha
+		public Image8i Inverted()
+		{
+			Image8i ret = new Image8i(Width, Height, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint count = Width * Height * GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			if (ChannelFormat == ChannelFormat.BGR || ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.GRAY)
+			{
+				for (uint i = 0; i < count; i++) ret.imageData[i] = (byte)(255 - imageData[i]);
+			}
+			else if (ChannelFormat == ChannelFormat.BGRA || ChannelFormat == ChannelFormat.RGBA)
+			{
+				for (uint i = 0; i < count; i += 4)
+				{
+					ret.imageData[i] = (byte)(255 - imageData[i]);
+					ret.imageData[i + 1] = (byte)(255 - imageData[i + 1]);
+					ret.imageData[i + 2] = (byte)(255 - imageData[i + 2]);
+					ret.imageData[i + 3] = imageData[i + 3];
+				}
+			}
+			else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				for (uint i = 0; i < count; i += 2)
+				{
+					ret.imageData[i] = (byte)(255 - imageData[i]);
+					ret.imageData[i + 1] = imageData[i + 1];
+				}
+			}
+
+			return ret;
+		}
+
+		public Image8i InvertAlpha()
+		{
+			if (ChannelFormat != ChannelFormat.RGBA && ChannelFormat != ChannelFormat.BGRA && ChannelFormat != ChannelFormat.GRAYAlpha) return this;
+
+			Image8i ret = new Image8i(Width, Height, ChannelFormat);
+			if (ret.ImageData == null) return ret;
+
+			uint count = Width * Height * GetBytePerPixelFromChannelFormat(ChannelFormat);
+
+			if (ChannelFormat == ChannelFormat.BGRA || ChannelFormat == ChannelFormat.RGBA)
+			{
+				for (uint i = 0; i < count; i += 4)
+				{
+					ret.imageData[i] = (byte)(imageData[i]);
+					ret.imageData[i + 1] = (byte)(imageData[i + 1]);
+					ret.imageData[i + 2] = (byte)(imageData[i + 2]);
+					ret.imageData[i + 3] = (byte)(255 - imageData[i + 3]);
+				}
+			}
+			else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			{
+				for (uint i = 0; i < count; i += 2)
+				{
+					ret.imageData[i] = (byte)(imageData[i]);
+					ret.imageData[i + 1] = (byte)(255 - imageData[i + 1]);
+				}
+			}
+
+			return ret;
+		}
+		#endregion
+
 		#region Line, PolyLine & Polygon
 		public void Line(int xstart, int ystart, int xend, int yend, Color8i color)
 		{
