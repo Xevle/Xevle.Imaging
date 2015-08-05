@@ -398,10 +398,10 @@ namespace Xevle.Imaging.Image.Formats
 				switch (bitsPerPixel_)
 				{
 					case 1:
-						format = ChannelFormat.GRAY;
+						format = ChannelFormat.Gray;
 						break;
 					case 2:
-						format = ChannelFormat.GRAYAlpha;
+						format = ChannelFormat.GrayAlpha;
 						break;
 					case 3:
 						format = ChannelFormat.RGB;
@@ -410,7 +410,7 @@ namespace Xevle.Imaging.Image.Formats
 						format = ChannelFormat.RGBA;
 						break;
 					default:
-						format = ChannelFormat.GRAY;
+						format = ChannelFormat.Gray;
 						break;
 				}
 
@@ -430,18 +430,18 @@ namespace Xevle.Imaging.Image.Formats
 
 			if (image.ChannelFormat == ChannelFormat.BGR)
 			{
-				ToFile(filename, image.ConvertToRGB());
+				ToFile(filename, image.ToChannelFormatRGB());
 				return;
 			}
 
 			if (image.ChannelFormat == ChannelFormat.BGRA)
 			{
-				ToFile(filename, image.ConvertToRGBA());
+				ToFile(filename, image.ToChannelFormatRGBA());
 				return;
 			}
 
 			bool isRGB = (image.ChannelFormat == ChannelFormat.BGR || image.ChannelFormat == ChannelFormat.RGB || image.ChannelFormat == ChannelFormat.BGRA || image.ChannelFormat == ChannelFormat.RGBA);
-			bool isAlpha = (image.ChannelFormat == ChannelFormat.BGRA || image.ChannelFormat == ChannelFormat.RGBA || image.ChannelFormat == ChannelFormat.GRAYAlpha);
+			bool isAlpha = (image.ChannelFormat == ChannelFormat.BGRA || image.ChannelFormat == ChannelFormat.RGBA || image.ChannelFormat == ChannelFormat.GrayAlpha);
 
 			ulong size = (ulong)(18 + ((isRGB) ? (isAlpha ? 4 : 3) : (isAlpha ? 2 : 1)) * image.Width * image.Height); // Length of data
 			if (size > 0xFFFFFFFF) throw new Exception(); // image is to big

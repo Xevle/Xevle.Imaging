@@ -200,15 +200,15 @@ namespace Xevle.Imaging.Image.Formats
 
 		public static void SaveToJpeg(string filename, int exifWidth, int exifHeight, Image8i image)
 		{
-			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.Gray)
 			{
-				SaveToJpeg(filename, exifWidth, exifHeight, image.ConvertToRGB());
+				SaveToJpeg(filename, exifWidth, exifHeight, image.ToChannelFormatRGB());
 				return;
 			}
 
-			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GrayAlpha)
 			{
-				SaveToJpeg(filename, exifWidth, exifHeight, image.ConvertToRGBA());
+				SaveToJpeg(filename, exifWidth, exifHeight, image.ToChannelFormatRGBA());
 				return;
 			}
 
@@ -273,15 +273,15 @@ namespace Xevle.Imaging.Image.Formats
 
 		public static void SaveToJpeg(string filename, int exifWidth, int exifHeight, byte quality, Image8i image)
 		{
-			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.Gray)
 			{
-				SaveToJpeg(filename, exifWidth, exifHeight, quality, image.ConvertToRGB());
+				SaveToJpeg(filename, exifWidth, exifHeight, quality, image.ToChannelFormatRGB());
 				return;
 			}
 
-			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GrayAlpha)
 			{
-				SaveToJpeg(filename, exifWidth, exifHeight, image.ConvertToRGBA());
+				SaveToJpeg(filename, exifWidth, exifHeight, image.ToChannelFormatRGBA());
 				return;
 			}
 
@@ -352,15 +352,15 @@ namespace Xevle.Imaging.Image.Formats
 
 		public static void SaveToPNG(string filename, Image8i image)
 		{
-			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.Gray)
 			{
-				SaveToPNG(filename, image.ConvertToRGB());
+				SaveToPNG(filename, image.ToChannelFormatRGB());
 				return;
 			}
 
-			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GrayAlpha)
 			{
-				SaveToPNG(filename, image.ConvertToRGBA());
+				SaveToPNG(filename, image.ToChannelFormatRGBA());
 				return;
 			}
 				
@@ -415,15 +415,15 @@ namespace Xevle.Imaging.Image.Formats
 
 		public static void SaveToTiff(string filename, Image8i image)
 		{
-			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.Gray)
 			{
-				SaveToPNG(filename, image.ConvertToRGB());
+				SaveToPNG(filename, image.ToChannelFormatRGB());
 				return;
 			}
 
-			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GrayAlpha)
 			{
-				SaveToPNG(filename, image.ConvertToRGBA());
+				SaveToPNG(filename, image.ToChannelFormatRGBA());
 				return;
 			}
 

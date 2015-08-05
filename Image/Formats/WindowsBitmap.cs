@@ -1048,15 +1048,15 @@ namespace Xevle.Imaging.Image.Formats
 
 		public static void ToFile(string filename, Image8i image)
 		{
-			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.GRAY)
+			if (image.ChannelFormat == ChannelFormat.BGR||image.ChannelFormat == ChannelFormat.Gray)
 			{
-				ToFile(filename, image.ConvertToRGB());
+				ToFile(filename, image.ToChannelFormatRGB());
 				return;
 			}
 
-			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (image.ChannelFormat == ChannelFormat.BGRA||image.ChannelFormat == ChannelFormat.GrayAlpha)
 			{
-				ToFile(filename, image.ConvertToRGBA());
+				ToFile(filename, image.ToChannelFormatRGBA());
 				return;
 			}
 

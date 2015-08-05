@@ -3,12 +3,12 @@
 namespace Xevle.Imaging.Image
 {
 	/// <summary>
-	/// List of color formats.
+	/// List of channel formats.
 	/// </summary>
 	public enum ChannelFormat
 	{
-		GRAY = 0,
-		GRAYAlpha = 1,
+		Gray = 0,
+		GrayAlpha = 1,
 		RGB = 2,
 		RGBA = 3,
 		BGR = 4,

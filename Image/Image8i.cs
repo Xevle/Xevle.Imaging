@@ -110,7 +110,7 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
-		#region Bitmap interoperable
+		#region Bitmap interoperable methods
 		public static Image8i FromBitmap(Bitmap bmp)
 		{
 			Image8i ret = null;
@@ -168,34 +168,34 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
-						intern = ConvertToRGB();
+						intern = ToChannelFormatRGB();
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
-						intern = ConvertToRGBA();
+						intern = ToChannelFormatRGBA();
 						break;
 					}
 				case ChannelFormat.RGB:
 					{
-						intern = ConvertToRGB();
+						intern = ToChannelFormatRGB();
 						break;
 					}
 				case ChannelFormat.BGR:
 					{
-						intern = ConvertToRGB();
+						intern = ToChannelFormatRGB();
 						break;
 					}
 				case ChannelFormat.RGBA:
 					{
-						intern = ConvertToRGBA();
+						intern = ToChannelFormatRGBA();
 						break;
 					}
 				case ChannelFormat.BGRA:
 					{
-						intern = ConvertToRGBA();
+						intern = ToChannelFormatRGBA();
 						break;
 					}
 			}
@@ -253,33 +253,33 @@ namespace Xevle.Imaging.Image
 		/// </summary>
 		/// <returns>The to.</returns>
 		/// <param name="channelFormat">Channel format.</param>
-		public Image8i ConvertTo(ChannelFormat channelFormat)
+		public Image8i ToChannelFormat(ChannelFormat channelFormat)
 		{
 			switch (channelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
-						return ConvertToGray();
+						return ToChannelFormatGray();
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
-						return ConvertToGrayAlpha();
+						return ToChannelFormatGrayAlpha();
 					}
 				case ChannelFormat.RGB:
 					{
-						return ConvertToRGB();
+						return ToChannelFormatRGB();
 					}
 				case ChannelFormat.RGBA:
 					{
-						return ConvertToRGBA();
+						return ToChannelFormatRGBA();
 					}
 				case ChannelFormat.BGR:
 					{
-						return ConvertToBGR();
+						return ToChannelFormatBGR();
 					}
 				case ChannelFormat.BGRA:
 					{
-						return ConvertToBGRA();
+						return ToChannelFormatBGRA();
 					}
 			}
 
@@ -290,10 +290,10 @@ namespace Xevle.Imaging.Image
 		/// Converts to gray.
 		/// </summary>
 		/// <returns>The to gray.</returns>
-		public Image8i ConvertToGray()
+		public Image8i ToChannelFormatGray()
 		{
-			if (ChannelFormat == ChannelFormat.GRAY) return this;
-			Image8i ret = new Image8i(Width, Height, ChannelFormat.GRAY);
+			if (ChannelFormat == ChannelFormat.Gray) return this;
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.Gray);
 			if (ret.imageData == null) return ret;
 
 			uint count = Width * Height;
@@ -304,7 +304,7 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -368,10 +368,10 @@ namespace Xevle.Imaging.Image
 		/// Converts to gray alpha.
 		/// </summary>
 		/// <returns>The to gray alpha.</returns>
-		public Image8i ConvertToGrayAlpha()
+		public Image8i ToChannelFormatGrayAlpha()
 		{
-			if (ChannelFormat == ChannelFormat.GRAYAlpha) return this;
-			Image8i ret = new Image8i(Width, Height, ChannelFormat.GRAYAlpha);
+			if (ChannelFormat == ChannelFormat.GrayAlpha) return this;
+			Image8i ret = new Image8i(Width, Height, ChannelFormat.GrayAlpha);
 			if (ret.imageData == null) return ret;
 
 			uint count = Width * Height;
@@ -382,7 +382,7 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -448,7 +448,7 @@ namespace Xevle.Imaging.Image
 		/// Converts to RGB.
 		/// </summary>
 		/// <returns>The to RG.</returns>
-		public Image8i ConvertToRGB()
+		public Image8i ToChannelFormatRGB()
 		{
 			if (ChannelFormat == ChannelFormat.RGB) return this;
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
@@ -462,7 +462,7 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -473,7 +473,7 @@ namespace Xevle.Imaging.Image
 						}
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -530,7 +530,7 @@ namespace Xevle.Imaging.Image
 		/// Converts to RGBA
 		/// </summary>
 		/// <returns>The to RGB.</returns>
-		public Image8i ConvertToRGBA()
+		public Image8i ToChannelFormatRGBA()
 		{
 			if (ChannelFormat == ChannelFormat.RGBA) return this;
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGBA);
@@ -544,7 +544,7 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -556,7 +556,7 @@ namespace Xevle.Imaging.Image
 						}
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -613,7 +613,7 @@ namespace Xevle.Imaging.Image
 		/// Converts to BGR.
 		/// </summary>
 		/// <returns>The to background.</returns>
-		public Image8i ConvertToBGR()
+		public Image8i ToChannelFormatBGR()
 		{
 			if (ChannelFormat == ChannelFormat.BGR) return this;
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.BGR);
@@ -627,7 +627,7 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -638,7 +638,7 @@ namespace Xevle.Imaging.Image
 						}
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -694,7 +694,7 @@ namespace Xevle.Imaging.Image
 		/// Converts ToBGR
 		/// </summary>
 		/// <returns>The to BGR.</returns>
-		public Image8i ConvertToBGRA()
+		public Image8i ToChannelFormatBGRA()
 		{
 			if (ChannelFormat == ChannelFormat.BGRA) return this;
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.BGRA);
@@ -707,7 +707,7 @@ namespace Xevle.Imaging.Image
 			uint inds = 0;
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -719,7 +719,7 @@ namespace Xevle.Imaging.Image
 						}
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						for (uint i = 0; i < count; i++)
 						{
@@ -778,9 +778,9 @@ namespace Xevle.Imaging.Image
 		/// </summary>
 		/// <returns>The to black white.</returns>
 		/// <param name="threshold">Threshold.</param>
-		public Image8i ConvertToBlackWhite(byte threshold)
+		public Image8i ToBlackWhite(byte threshold)
 		{
-			Image8i ret = ConvertToGray();
+			Image8i ret = ToChannelFormatGray();
 			if (ret.imageData == null) return ret;
 
 			uint count = Width * Height;
@@ -795,9 +795,9 @@ namespace Xevle.Imaging.Image
 		/// Swaps the channels to BRG.
 		/// </summary>
 		/// <returns>The channels to BR.</returns>
-		public Image8i SwapChannelsToBRG()
+		public Image8i ToBRGSwappedChannels()
 		{
-			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			if (ChannelFormat != ChannelFormat.RGB) return this.ToChannelFormatRGB().ToBGRSwappedChannels();
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
 			if (ret.imageData == null) return ret;
 
@@ -822,12 +822,12 @@ namespace Xevle.Imaging.Image
 		}
 
 		/// <summary>
-		/// Swaps the channels to RBB
+		/// Swaps the channels to RBG
 		/// </summary>
-		/// <returns>The channels to RB.</returns>
-		public Image8i SwapChannelsToRBG()
+		/// <returns>The channels to RBG</returns>
+		public Image8i ToRBGSwappedChannels()
 		{
-			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			if (ChannelFormat != ChannelFormat.RGB) return this.ToChannelFormatRGB().ToBGRSwappedChannels();
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
 			if (ret.imageData == null) return ret;
 
@@ -837,7 +837,7 @@ namespace Xevle.Imaging.Image
 			byte[] dst = ret.imageData;
 			uint inds = 0;
 
-			//Channel Swap RGB
+			//Channel Swap RBB
 			for (uint i = 0; i < count; i++)
 			{
 				byte r = src[inds++];
@@ -854,10 +854,10 @@ namespace Xevle.Imaging.Image
 		/// <summary>
 		/// Swaps the channels to GRB.
 		/// </summary>
-		/// <returns>The channels to GR.</returns>
-		public Image8i SwapChannelsToGRB()
+		/// <returns>The channels to GRB</returns>
+		public Image8i ToGRBSwappedChannels()
 		{
-			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			if (ChannelFormat != ChannelFormat.RGB) return this.ToChannelFormatRGB().ToBGRSwappedChannels();
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
 			if (ret.imageData == null) return ret;
 
@@ -885,9 +885,9 @@ namespace Xevle.Imaging.Image
 		/// Swaps the channels to BGR.
 		/// </summary>
 		/// <returns>The channels to background.</returns>
-		public Image8i SwapChannelsToBGR()
+		public Image8i ToBGRSwappedChannels()
 		{
-			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBGR();
+			if (ChannelFormat != ChannelFormat.RGB) return this.ToChannelFormatRGB().ToBGRSwappedChannels();
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
 			if (ret.imageData == null) return ret;
 
@@ -915,9 +915,9 @@ namespace Xevle.Imaging.Image
 		/// Swaps the channels to GBR;
 		/// </summary>
 		/// <returns>The channels to GB.</returns>
-		public Image8i SwapChannelsToGBR()
+		public Image8i ToGBRSwappedChannels()
 		{
-			if (ChannelFormat != ChannelFormat.RGB) return this.ConvertToRGB().SwapChannelsToBRG();
+			if (ChannelFormat != ChannelFormat.RGB) return this.ToChannelFormatRGB().ToBGRSwappedChannels();
 			Image8i ret = new Image8i(Width, Height, ChannelFormat.RGB);
 			if (ret.imageData == null) return ret;
 
@@ -943,7 +943,7 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Circle & CircleFilled
-		public void Circle(int x0, int y0, uint radius, Color8i color)
+		public void DrawCircle(int x0, int y0, uint radius, Color8i color)
 		{
 			int f = 1 - (int)radius;
 			int ddF_x = 0;
@@ -979,7 +979,7 @@ namespace Xevle.Imaging.Image
 			}
 		}
 
-		public void CircleFilled(int x0, int y0, uint radius, Color8i color)
+		public void DrawCircleFilled(int x0, int y0, uint radius, Color8i color)
 		{
 			for (int i = x0 - (int)radius; i <= x0 + radius; i++)
 			{
@@ -1004,7 +1004,7 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Downsampling
-		public Image8i Downsample(uint w, uint h)
+		public Image8i ToDownsampledImage(uint w, uint h)
 		{
 			if (Width < w || Height < h) throw new Exception("Don't upsample an image using 'Downsample()'");
 
@@ -1016,24 +1016,24 @@ namespace Xevle.Imaging.Image
 			{
 				if (Height != h)
 				{
-					if ((Height * w) > (Width * h)) return DownsampleVertical(h).DownsampleHorizontal(w);
-					return DownsampleHorizontal(w).DownsampleVertical(h);
+					if ((Height * w) > (Width * h)) return ToDownsampledImageVertical(h).ToDownsampledImageHorizontal(w);
+					return ToDownsampledImageHorizontal(w).ToDownsampledImageVertical(h);
 				}
-				return DownsampleHorizontal(w);
+				return ToDownsampledImageHorizontal(w);
 			}
 
-			return DownsampleVertical(h);
+			return ToDownsampledImageVertical(h);
 		}
 
-		unsafe Image8i DownsampleVertical(uint h)
+		unsafe Image8i ToDownsampledImageVertical(uint h)
 		{
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			if (h == 0) return new Image8i(0, 0, ChannelFormat);
 
-			if (Height > h && Height % h == 0) return ReduceByVertical(Height / h);
+			if (Height > h && Height % h == 0) return ToReducedByImageVertical(Height / h);
 			double delta = ((double)Height) / h;
 
-			if (ChannelFormat == ChannelFormat.GRAY)
+			if (ChannelFormat == ChannelFormat.Gray)
 			{
 				Image8i ret = new Image8i(Width, h, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -1208,7 +1208,7 @@ namespace Xevle.Imaging.Image
 				return ret;
 			}
 
-			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				Image8i ret = new Image8i(Width, h, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -1273,16 +1273,16 @@ namespace Xevle.Imaging.Image
 			return new Image8i(0, 0, ChannelFormat);
 		}
 
-		unsafe Image8i DownsampleHorizontal(uint w)
+		unsafe Image8i ToDownsampledImageHorizontal(uint w)
 		{
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			if (w == 0) return new Image8i(0, 0, ChannelFormat);
 
-			if (Width > w && Width % w == 0) return ReduceByHorizontal(Width / w);
+			if (Width > w && Width % w == 0) return ToReducedByImageHorizontal(Width / w);
 
 			double delta = ((double)Width) / w;
 
-			if (ChannelFormat == ChannelFormat.GRAY)
+			if (ChannelFormat == ChannelFormat.Gray)
 			{
 				Image8i ret = new Image8i(w, Height, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -1448,7 +1448,7 @@ namespace Xevle.Imaging.Image
 				return ret;
 			}
 
-			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				Image8i ret = new Image8i(w, Height, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -1514,12 +1514,12 @@ namespace Xevle.Imaging.Image
 		/// <param name="x">The x coordinate.</param>
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="source">Source.</param>
-		public void Draw(int x, int y, Image8i source)
+		public void Draw(int x, int y, Image8i sourceImage)
 		{
 			if (x >= Width || y >= Height) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
-			if (x + source.Width < 0 || y + source.Height < 0) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
+			if (x + sourceImage.Width < 0 || y + sourceImage.Height < 0) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
 
-			Image8i srcimg = source.ConvertTo(ChannelFormat);
+			Image8i srcimg = sourceImage.ToChannelFormat(ChannelFormat);
 			if (srcimg == null) return;
 
 			uint bytePerPixel = GetBytePerPixelFromChannelFormat(ChannelFormat);
@@ -1529,15 +1529,15 @@ namespace Xevle.Imaging.Image
 				fixed(byte* src_=srcimg.imageData, dst_=imageData)
 				{
 					uint start = (uint)System.Math.Max(-x, 0) * bytePerPixel;
-					uint end = (uint)System.Math.Min(source.Width, Width - x) * bytePerPixel;
+					uint end = (uint)System.Math.Min(sourceImage.Width, Width - x) * bytePerPixel;
 
 					uint jstart = (uint)System.Math.Max(-y, 0);
-					uint jend = (uint)System.Math.Min(source.Height, Height - y);
+					uint jend = (uint)System.Math.Min(sourceImage.Height, Height - y);
 
 					byte* src__ = src_ + start;
 					byte* dst__ = dst_ + x * bytePerPixel + start;
 
-					uint sw = source.Width * bytePerPixel;
+					uint sw = sourceImage.Width * bytePerPixel;
 					uint dw = Width * bytePerPixel;
 
 					for (uint j = jstart; j < jend; j++)
@@ -1561,7 +1561,7 @@ namespace Xevle.Imaging.Image
 		public void Draw(int x, int y, Image8i source, bool considerAlpha)
 		{
 			if (!considerAlpha || source.ChannelFormat == ChannelFormat.BGR ||
-			    source.ChannelFormat == ChannelFormat.RGB || source.ChannelFormat == ChannelFormat.GRAY)
+			    source.ChannelFormat == ChannelFormat.RGB || source.ChannelFormat == ChannelFormat.Gray)
 			{
 				Draw(x, y, source);
 				return;
@@ -1574,34 +1574,34 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
-						sourceImage = source.ConvertToGrayAlpha();
+						sourceImage = source.ToChannelFormatGrayAlpha();
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
-						sourceImage = source.ConvertToGrayAlpha();
+						sourceImage = source.ToChannelFormatGrayAlpha();
 						break;
 					}
 				case ChannelFormat.RGB:
 					{
-						sourceImage = source.ConvertToRGBA();
+						sourceImage = source.ToChannelFormatRGBA();
 						break;
 					}
 				case ChannelFormat.RGBA:
 					{
-						sourceImage = source.ConvertToRGBA();
+						sourceImage = source.ToChannelFormatRGBA();
 						break;
 					}
 				case ChannelFormat.BGR:
 					{
-						sourceImage = source.ConvertToBGRA();
+						sourceImage = source.ToChannelFormatBGRA();
 						break;
 					}
 				case ChannelFormat.BGRA:
 					{
-						sourceImage = source.ConvertToBGRA();
+						sourceImage = source.ToChannelFormatBGRA();
 						break;
 					}
 			}
@@ -1618,7 +1618,7 @@ namespace Xevle.Imaging.Image
 					uint jstart = (uint)System.Math.Max(-y, 0);
 					uint jend = (uint)System.Math.Min(source.Height, Height - y);
 
-					if (ChannelFormat == ChannelFormat.BGR || ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.GRAY)
+					if (ChannelFormat == ChannelFormat.BGR || ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.Gray)
 					{
 						uint dbpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
 
@@ -1767,7 +1767,7 @@ namespace Xevle.Imaging.Image
 				{
 					byte* dst = dst_;
 
-					if (ChannelFormat == ChannelFormat.GRAY)
+					if (ChannelFormat == ChannelFormat.Gray)
 					{
 						byte g = color.R;
 						int len = imageData.Length;
@@ -1833,7 +1833,7 @@ namespace Xevle.Imaging.Image
 							*dst++ = a;
 						}
 					}
-					else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+					else if (ChannelFormat == ChannelFormat.GrayAlpha)
 					{
 						byte g = color.R;
 						byte a = color.A;
@@ -1916,15 +1916,15 @@ namespace Xevle.Imaging.Image
 		public void FillWithTestPattern()
 		{
 			Fill(Color8i.Red);
-			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 32), Color8i.Green);
-			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 16), Color8i.Blue);
-			CircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 8), Color8i.Yellow);
+			DrawCircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 32), Color8i.Green);
+			DrawCircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 16), Color8i.Blue);
+			DrawCircleFilled((int)(Width / 2), (int)(Height / 2), (uint)(Width / 2 - Width / 8), Color8i.Yellow);
 
-			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 8), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 8), Color8i.Red);
-			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 16), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 16), Color8i.Green);
-			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 24), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 24), Color8i.Blue);
-			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 32), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 32), Color8i.Black);
-			Line((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 40), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 40), Color8i.White);
+			DrawLine((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 8), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 8), Color8i.Red);
+			DrawLine((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 16), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 16), Color8i.Green);
+			DrawLine((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 24), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 24), Color8i.Blue);
+			DrawLine((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 32), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 32), Color8i.Black);
+			DrawLine((int)(Width / 2 - Width / 8), (int)(Height / 2 - Height / 40), (int)(Width / 2 + Width / 8), (int)(Height / 2 - Height / 40), Color8i.White);
 		}
 		#endregion
 
@@ -1935,7 +1935,7 @@ namespace Xevle.Imaging.Image
 		/// <returns>The image.</returns>
 		public Image8i GetImage()
 		{
-			return GetSubImage(0, 0, Width, Height);
+			return GetSubimage(0, 0, Width, Height);
 		}
 
 		/// <summary>
@@ -1946,7 +1946,7 @@ namespace Xevle.Imaging.Image
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="w">The width.</param>
 		/// <param name="h">The height.</param>
-		public Image8i GetSubImage(uint x, uint y, uint w, uint h)
+		public Image8i GetSubimage(uint x, uint y, uint w, uint h)
 		{
 			if (x >= Width || y >= Height) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
 
@@ -1966,11 +1966,11 @@ namespace Xevle.Imaging.Image
 		{
 			switch (format)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						return 1;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						return 2;
 					}
@@ -2064,14 +2064,14 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Inverted, InvertedAlpha
-		public Image8i Inverted()
+		public Image8i ToInvertedImage()
 		{
 			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.imageData == null) return ret;
 
 			uint count = Width * Height * GetBytePerPixelFromChannelFormat(ChannelFormat);
 
-			if (ChannelFormat == ChannelFormat.BGR || ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.GRAY)
+			if (ChannelFormat == ChannelFormat.BGR || ChannelFormat == ChannelFormat.RGB || ChannelFormat == ChannelFormat.Gray)
 			{
 				for (uint i = 0; i < count; i++) ret.imageData[i] = (byte)(255 - imageData[i]);
 			}
@@ -2085,7 +2085,7 @@ namespace Xevle.Imaging.Image
 					ret.imageData[i + 3] = imageData[i + 3];
 				}
 			}
-			else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			else if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				for (uint i = 0; i < count; i += 2)
 				{
@@ -2097,9 +2097,9 @@ namespace Xevle.Imaging.Image
 			return ret;
 		}
 
-		public Image8i InvertAlpha()
+		public Image8i ToAlphaInvertedImage()
 		{
-			if (ChannelFormat != ChannelFormat.RGBA && ChannelFormat != ChannelFormat.BGRA && ChannelFormat != ChannelFormat.GRAYAlpha) return this;
+			if (ChannelFormat != ChannelFormat.RGBA && ChannelFormat != ChannelFormat.BGRA && ChannelFormat != ChannelFormat.GrayAlpha) return this;
 
 			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.ImageData == null) return ret;
@@ -2116,7 +2116,7 @@ namespace Xevle.Imaging.Image
 					ret.imageData[i + 3] = (byte)(255 - imageData[i + 3]);
 				}
 			}
-			else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			else if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				for (uint i = 0; i < count; i += 2)
 				{
@@ -2130,16 +2130,16 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Line, PolyLine & Polygon
-		public void Line(int xstart, int ystart, int xend, int yend, Color8i color)
+		public void DrawLine(int xStart, int yStart, int xEnd, int yEnd, Color8i color)
 		{
-			//Initialisierung
+			// Init
 			int x, y, t, dist, xerr, yerr, dx, dy, incx, incy;
 
-			// Entfernung in beiden Dimensionen berechnen
-			dx = xend - xstart;
-			dy = yend - ystart;
+			// Calculate distance
+			dx = xEnd - xStart;
+			dy = yEnd - yStart;
 
-			// Vorzeichen des Inkrements bestimmen
+			// Estimate sign
 			if (dx < 0)
 			{
 				incx = -1;
@@ -2156,16 +2156,16 @@ namespace Xevle.Imaging.Image
 			else if (dy > 0) incy = 1;
 			else incy = 0;
 
-			// feststellen, welche Entfernung größer ist
+			// which distance is greater?
 			dist = (dx > dy) ? dx : dy;
 
-			// Initialisierungen vor Schleifenbeginn
-			x = xstart;
-			y = ystart;
+			// Init
+			x = xStart;
+			y = yStart;
 			xerr = dx;
 			yerr = dy;
 
-			// Pixel berechnen
+			// Calculate pixel
 			for (t = 0; t < dist; ++t)
 			{
 				SetPixel(x, y, color);
@@ -2186,23 +2186,23 @@ namespace Xevle.Imaging.Image
 				}
 			}
 
-			SetPixel(xend, yend, color);
+			SetPixel(xEnd, yEnd, color);
 		}
 		#endregion
 
 		#region NearestPixelResize
-		public Image8i NearestPixelResize(uint w, uint h)
+		public Image8i ToNearestPixelResizedImage(uint w, uint h)
 		{
 			if (Width == w && Height == h) return this;
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			if ((w * h) == 0) return new Image8i(0, 0, ChannelFormat);
 
-			if (Width == w) return NearestPixelResizeVertical(h);
-			if (Height == h) return NearestPixelResizeHorizontal(w);
-			return NearestPixelResizeVerticalHorizontal(w, h);
+			if (Width == w) return ToNearestPixelResizedImageVertical(h);
+			if (Height == h) return ToNearestPixelResizedImageHorizontal(w);
+			return ToNearestPixelResizedImageVerticalHorizontal(w, h);
 		}
 
-		Image8i NearestPixelResizeVertical(uint h)
+		Image8i ToNearestPixelResizedImageVertical(uint h)
 		{
 			double delta = (double)Height / h;
 
@@ -2223,7 +2223,7 @@ namespace Xevle.Imaging.Image
 			return ret;
 		}
 
-		Image8i NearestPixelResizeHorizontal(uint w)
+		Image8i ToNearestPixelResizedImageHorizontal(uint w)
 		{
 			double delta = (double)Width / w;
 
@@ -2323,7 +2323,7 @@ namespace Xevle.Imaging.Image
 			return new Image8i(0, 0, ChannelFormat);
 		}
 
-		Image8i NearestPixelResizeVerticalHorizontal(uint w, uint h)
+		Image8i ToNearestPixelResizedImageVerticalHorizontal(uint w, uint h)
 		{
 			double deltah = (double)Height / h;
 			double deltaw = (double)Width / w;
@@ -2426,6 +2426,11 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Pixel methods
+		public Color8i GetPixel(int x, int y)
+		{
+			return GetPixel((uint)x, (uint)y);
+		}
+
 		/// <summary>
 		/// Gets the pixel.
 		/// </summary>
@@ -2441,12 +2446,12 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						byte color = imageData[pos];
 						return new Color8i(color, color, color);
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						byte color = imageData[pos];
 						return new Color8i(imageData[pos + 1], color, color, color);
@@ -2506,12 +2511,12 @@ namespace Xevle.Imaging.Image
 
 			switch (ChannelFormat)
 			{
-				case ChannelFormat.GRAY:
+				case ChannelFormat.Gray:
 					{
 						imageData[pos] = color.R;
 						break;
 					}
-				case ChannelFormat.GRAYAlpha:
+				case ChannelFormat.GrayAlpha:
 					{
 						imageData[pos] = color.R;
 						imageData[pos + 1] = color.A;
@@ -2552,15 +2557,15 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Rect & RectFilled
-		public void Rect(int x, int y, uint w, uint h, Color8i color)
+		public void DrawRectangle(int x, int y, uint w, uint h, Color8i color)
 		{
-			Line(x, y, x + (int)w, y, color); // von 1 zu 2
-			Line(x + (int)w, y, x + (int)w, y + (int)h, color); // von 2 zu 3
-			Line(x + (int)w, y + (int)h, x, y + (int)h, color); // von 3 zu 4
-			Line(x, y + (int)h, x, y, color); // von 4 zu 1
+			DrawLine(x, y, x + (int)w, y, color); // von 1 zu 2
+			DrawLine(x + (int)w, y, x + (int)w, y + (int)h, color); // von 2 zu 3
+			DrawLine(x + (int)w, y + (int)h, x, y + (int)h, color); // von 3 zu 4
+			DrawLine(x, y + (int)h, x, y, color); // von 4 zu 1
 		}
 
-		public void RectFilled(int x, int y, uint w, uint h, Color8i color)
+		public void DrawRectangleFilled(int x, int y, uint w, uint h, Color8i color)
 		{
 			if (x >= Width || y >= Height) throw new ArgumentOutOfRangeException("x or y", "Out of image.");
 
@@ -2580,7 +2585,7 @@ namespace Xevle.Imaging.Image
 
 					uint dw = Width * bpp;
 
-					if (ChannelFormat == ChannelFormat.GRAY)
+					if (ChannelFormat == ChannelFormat.Gray)
 					{
 						byte g = color.R;
 
@@ -2667,7 +2672,7 @@ namespace Xevle.Imaging.Image
 							}
 						}
 					}
-					else if (ChannelFormat == ChannelFormat.GRAYAlpha)
+					else if (ChannelFormat == ChannelFormat.GrayAlpha)
 					{
 						byte g = color.R;
 						byte a = color.A;
@@ -2689,7 +2694,7 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region ReduceByN
-		public Image8i ReduceBy(uint m, uint n)
+		public Image8i ToReducedByImage(uint m, uint n)
 		{
 			if (m == 1 && n == 1) return this;
 			if ((m * n) == 0) return new Image8i(0, 0, ChannelFormat);
@@ -2704,25 +2709,25 @@ namespace Xevle.Imaging.Image
 
 			if (wr != 0)
 			{
-				if (hr != 0) return Downsample(wm, hn);
-				if (n == 1) return DownsampleHorizontal(wm);
-				return ReduceByVertical(n).DownsampleHorizontal(wm); // ReduceBy is usually faster, so ist down first
+				if (hr != 0) return ToDownsampledImage(wm, hn);
+				if (n == 1) return ToDownsampledImageHorizontal(wm);
+				return ToReducedByImageVertical(n).ToDownsampledImageHorizontal(wm); // ReduceBy is usually faster, so ist down first
 			}
 
 			if (hr != 0)
 			{
-				if (m == 1) return DownsampleVertical(hn);
-				return ReduceByHorizontal(m).DownsampleVertical(hn); // ReduceBy is usually faster, so ist down first
+				if (m == 1) return ToDownsampledImageVertical(hn);
+				return ToReducedByImageHorizontal(m).ToDownsampledImageVertical(hn); // ReduceBy is usually faster, so ist down first
 			}
 
-			if (m == 1) return ReduceByVertical(n);
-			if (n == 1) return ReduceByHorizontal(m);
+			if (m == 1) return ToReducedByImageVertical(n);
+			if (n == 1) return ToReducedByImageHorizontal(m);
 
-			if ((hn * Width) > (wm * Height)) return ReduceByHorizontal(m).ReduceByVertical(n);
-			return ReduceByVertical(n).ReduceByHorizontal(m);
+			if ((hn * Width) > (wm * Height)) return ToReducedByImageHorizontal(m).ToReducedByImageVertical(n);
+			return ToReducedByImageVertical(n).ToReducedByImageHorizontal(m);
 		}
 
-		public Image8i ReduceBy(uint m)
+		public Image8i ToReducedByImage(uint m)
 		{
 			if (m == 1) return this;
 			if (m == 0) return new Image8i(0, 0, ChannelFormat);
@@ -2737,27 +2742,27 @@ namespace Xevle.Imaging.Image
 
 			if (wr != 0)
 			{
-				if (hr != 0) return Downsample(wm, hn);
-				if (m == 1) return DownsampleHorizontal(wm);
-				return ReduceByVertical(m).DownsampleHorizontal(wm); // ReduceBy is usually faster, so ist down first
+				if (hr != 0) return ToDownsampledImage(wm, hn);
+				if (m == 1) return ToDownsampledImageHorizontal(wm);
+				return ToReducedByImageVertical(m).ToDownsampledImageHorizontal(wm); // ReduceBy is usually faster, so ist down first
 			}
 
 			if (hr != 0)
 			{
-				if (m == 1) return DownsampleVertical(hn);
-				return ReduceByHorizontal(m).DownsampleVertical(hn); // ReduceBy is usually faster, so ist down first
+				if (m == 1) return ToDownsampledImageVertical(hn);
+				return ToReducedByImageHorizontal(m).ToDownsampledImageVertical(hn); // ReduceBy is usually faster, so ist down first
 			}
 
-			if ((hn * Width) > (wm * Height)) return ReduceByHorizontal(m).ReduceByVertical(m);
-			return ReduceByVertical(m).ReduceByHorizontal(m);
+			if ((hn * Width) > (wm * Height)) return ToReducedByImageHorizontal(m).ToReducedByImageVertical(m);
+			return ToReducedByImageVertical(m).ToReducedByImageHorizontal(m);
 		}
 
-		Image8i ReduceByVertical(uint n)
+		Image8i ToReducedByImageVertical(uint n)
 		{
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			uint h = Height / n;
 
-			if (ChannelFormat == ChannelFormat.GRAY)
+			if (ChannelFormat == ChannelFormat.Gray)
 			{
 				Image8i ret = new Image8i(Width, h, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -2875,7 +2880,7 @@ namespace Xevle.Imaging.Image
 				return ret;
 			}
 
-			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				Image8i ret = new Image8i(Width, h, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -2923,13 +2928,13 @@ namespace Xevle.Imaging.Image
 			return new Image8i(0, 0, ChannelFormat);
 		}
 
-		Image8i ReduceByHorizontal(uint m)
+		Image8i ToReducedByImageHorizontal(uint m)
 		{
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			uint w = Width / m;
 			uint wh = w * Height;
 
-			if (ChannelFormat == ChannelFormat.GRAY)
+			if (ChannelFormat == ChannelFormat.Gray)
 			{
 				Image8i ret = new Image8i(w, Height, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -3023,7 +3028,7 @@ namespace Xevle.Imaging.Image
 				return ret;
 			}
 
-			if (ChannelFormat == ChannelFormat.GRAYAlpha)
+			if (ChannelFormat == ChannelFormat.GrayAlpha)
 			{
 				Image8i ret = new Image8i(w, Height, ChannelFormat);
 				if (ret.imageData == null) return ret;
@@ -3065,42 +3070,42 @@ namespace Xevle.Imaging.Image
 		#endregion
 
 		#region Resize
-		public Image8i Resize(int w, int h)
+		public Image8i ToResizedImage(int w, int h)
 		{
-			return Resize((uint)w, (uint)h);
+			return ToResizedImage((uint)w, (uint)h);
 		}
 
-		public Image8i Resize(uint w, uint h)
+		public Image8i ToResizedImage(uint w, uint h)
 		{
 			if (Width == w && Height == h) return this;
 			if ((Width * Height) == 0) return new Image8i(0, 0, ChannelFormat);
 			if ((w * h) == 0) return new Image8i(0, 0, ChannelFormat);
 
-			if (Width <= w && Height <= h) return NearestPixelResize(w, h);
+			if (Width <= w && Height <= h) return ToNearestPixelResizedImage(w, h);
 
-			if (Width > w && Height > h) return Downsample(w, h);
+			if (Width > w && Height > h) return ToDownsampledImage(w, h);
 
-			if (Width > w) return DownsampleHorizontal(w).NearestPixelResizeVertical(h);
+			if (Width > w) return ToDownsampledImageHorizontal(w).ToNearestPixelResizedImageVertical(h);
 
-			return DownsampleVertical(h).NearestPixelResizeHorizontal(w);
+			return ToDownsampledImageVertical(h).ToNearestPixelResizedImageHorizontal(w);
 		}
 
-		public Image8i ResizeToPowerOf2()
+		public Image8i ToPowerOf2ResizedImage()
 		{
-			return Resize(BinaryArithmetic.GetPowerOf2(Width), BinaryArithmetic.GetPowerOf2(Height));
+			return ToResizedImage(BinaryArithmetic.GetPowerOf2(Width), BinaryArithmetic.GetPowerOf2(Height));
 		}
 
-		public Image8i ResizeByWidth(double newWidth)
+		public Image8i ToResizedImageByWidth(double newWidth)
 		{
 			double sizeFactor = newWidth / Width;
 			double newHeight = sizeFactor * Height;
 
-			return Resize((uint)newWidth, (uint)newHeight);
+			return ToResizedImage((uint)newWidth, (uint)newHeight);
 		}
 		#endregion
 
 		#region Text
-		public static Image8i RenderText(string text, Font font, Color color)
+		public static Image8i GetRenderedText(string text, Font font, Color color)
 		{
 			// calculate image dimensions
 			Bitmap bitmap = new Bitmap(1, 1);
@@ -3132,7 +3137,7 @@ namespace Xevle.Imaging.Image
 			return Image8i.FromBitmap(bitmap);
 		}
 
-		public static Image8i RenderText(string text, string filename, int size, Color color)
+		public static Image8i GetRenderedText(string text, string filename, int size, Color color)
 		{
 			PrivateFontCollection pfc = new PrivateFontCollection();
 			pfc.AddFontFile(filename);
@@ -3140,12 +3145,12 @@ namespace Xevle.Imaging.Image
 			FontFamily fontfam = pfc.Families[0];
 			Font font = new Font(fontfam, size);
 
-			return RenderText(text, font, color);
+			return GetRenderedText(text, font, color);
 		}
 		#endregion
 
 		#region Transformations
-		public Image8i ToFlippedHorizontal()
+		public Image8i ToFlippedImageHorizontal()
 		{
 			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.imageData == null) return ret;
@@ -3165,7 +3170,7 @@ namespace Xevle.Imaging.Image
 			return ret;
 		}
 
-		public Image8i ToFlippedVertical()
+		public Image8i ToFlippedImageVertical()
 		{
 			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.imageData == null) return ret;
@@ -3190,7 +3195,55 @@ namespace Xevle.Imaging.Image
 			return ret;
 		}
 
-		public Image8i ToRot90()
+		public Image8i ToFlippedImageDiagonal()
+		{
+			Image8i ret = new Image8i(Height, Width, ChannelFormat);
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Height * bpp;
+
+			uint src = 0;
+			uint dst = 0;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				for (uint x = 0; x < Width; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					dst += bw - bpp;
+				}
+				dst = y * bpp;
+			}
+
+			return ret;
+		}
+
+		public Image8i ToFlippedImageCounterDiagonal()
+		{
+			Image8i ret = new Image8i(Height, Width, ChannelFormat);
+			if (ret.imageData == null) return ret;
+
+			uint bpp = GetBytePerPixelFromChannelFormat(ChannelFormat);
+			uint bw = Height * bpp;
+
+			uint src = 0;
+			uint dst = Width * bw - bpp;
+
+			for (uint y = 0; y < Height; y++)
+			{
+				uint tmp = dst;
+				for (uint x = 0; x < Width; x++)
+				{
+					for (uint i = 0; i < bpp; i++) ret.imageData[dst++] = imageData[src++];
+					dst -= bw + bpp;
+				}
+				dst = tmp - bpp;
+			}
+
+			return ret;
+		}
+
+		public Image8i To90DegreeRotatedImage()
 		{
 			Image8i ret = new Image8i(Height, Width, ChannelFormat);
 			if (ret.imageData == null) return ret;
@@ -3211,10 +3264,11 @@ namespace Xevle.Imaging.Image
 				}
 				dst_ += bpp;
 			}
+
 			return ret;
 		}
 
-		public Image8i ToRot180()
+		public Image8i To180DegreeRotatedImage()
 		{
 			Image8i ret = new Image8i(Width, Height, ChannelFormat);
 			if (ret.imageData == null) return ret;
@@ -3238,7 +3292,7 @@ namespace Xevle.Imaging.Image
 			return ret;
 		}
 
-		public Image8i ToRot270()
+		public Image8i To270DegreeRotatedImage()
 		{
 			Image8i ret = new Image8i(Height, Width, ChannelFormat);
 			if (ret.imageData == null) return ret;
@@ -3259,6 +3313,7 @@ namespace Xevle.Imaging.Image
 				}
 				src_ += bpp;
 			}
+
 			return ret;
 		}
 		#endregion
