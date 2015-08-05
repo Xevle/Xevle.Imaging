@@ -1998,6 +1998,71 @@ namespace Xevle.Imaging.Image
 		}
 		#endregion
 
+		#region Image computing
+		/// <summary>
+		/// Compare the specified compareImage with a threshold.
+		/// Returns similartiy in percent (100 % == similar images)
+		/// </summary>
+		/// <param name="compareImage">Compare image.</param>
+		/// <param name="threshold">Threshold.</param>
+		public double Compare(Image8i compareImage, uint threshold)
+		{
+			if (compareImage == null) throw new Exception("Image is null");
+			if (Width != compareImage.Width) throw new Exception("Image have different sizes");
+			if (Height != compareImage.Height) throw new Exception("Image have different sizes");
+			if (ChannelFormat != compareImage.ChannelFormat) throw new Exception("Image have different formats");
+
+			uint divergency = 0;
+
+			for (uint y = 0; y < Width; y++)
+			{
+				for (uint x = 0; x < Height; x++)
+				{
+					Color8i picA = GetPixel(x, y);
+					Color8i picB = compareImage.GetPixel(x, y);
+
+					int dif = 0;
+
+					dif += System.Math.Abs(picA.R - picB.R);
+					dif += System.Math.Abs(picA.G - picB.G);
+					dif += System.Math.Abs(picA.B - picB.B);
+					dif /= 3;
+
+					if (dif > threshold) divergency++;
+				}
+			}
+				
+			return (double)(100 * (divergency / (double)(Width * Height)));
+		}
+
+		public Color8i GetMedianColor()
+		{
+			long r = 0;
+			long g = 0;
+			long b = 0;
+			long a = 0;
+
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					Color8i pix = GetPixel((uint)x, (uint)y);
+					r += pix.R;
+					g += pix.G;
+					b += pix.B;
+					a += pix.A;
+				}
+			}
+
+			r = r / (Width * Height);
+			g = g / (Width * Height);
+			b = b / (Width * Height);
+			a = a / (Width * Height);
+
+			return new Color8i((byte)a, (byte)r, (byte)g, (byte)b);
+		}
+		#endregion
+
 		#region Inverted, InvertedAlpha
 		public Image8i Inverted()
 		{
