@@ -47,6 +47,7 @@
     <Compile Include="Image\Formats\WindowsBitmap.cs" />
     <Compile Include="Image\Formats\TargaImage.cs" />
     <Compile Include="Image\Formats\FormatAdapter.cs" />
+    <Compile Include="Image\ColorSpace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
