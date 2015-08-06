@@ -16,9 +16,9 @@ namespace Xevle.Imaging.Image
 			imgLoadOrder = new List<string>();
 		}
 
-		public PooledLoader(uint mxi)
+		public PooledLoader(uint maxSize)
 		{
-			maxImages = (int)mxi;
+			maxImages = (int)maxSize;
 			imgPool = new Dictionary<string, IImage>();
 			imgLoadOrder = new List<string>();
 		}
